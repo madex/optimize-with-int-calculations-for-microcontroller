@@ -1,7 +1,7 @@
 OUT      ?= test
-OBJ       = $(OUT).o
+OBJ       = $(OUT).o asmlib.o
 
-OPTIMIZE  = -Os
+OPTIMIZE  = -O2
 WARNINGS  =
 LIBS      = 
 SIM_OBJ   = $(patsubst %.o,%_sim.o,$(OBJ))
@@ -30,7 +30,7 @@ simul: $(OUT)_sim.elf $(OUT)_sim.lst
 %.lst: %.elf
 	$(OBJDUMP) -h -S $< > $@
 
-all:
+all: simul
 	echo make simul   for avr simulation
 
 $(SIM_OBJ):Makefile

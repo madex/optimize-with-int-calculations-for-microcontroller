@@ -1,8 +1,81 @@
 #ifdef  __IAR_SYSTEMS_ICC__
 #include <ioavr.h>
+#define PROGMEM __flash
+#define PW(a) (a)
 #else
 #include <avr/io.h>
+#include <stdlib.h>
+#include <math.h>
+#include <avr/pgmspace.h>
+#define PW(a) pgm_read_word(&(a))
 #endif
+
+int16_t PROGMEM sin_table[66] = {
+
+      0,   804,  1608,  2410,  3212,  4011,  4808,  5602,
+   6393,  7179,  7962,  8739,  9512, 10278, 11039, 11793,
+  12539, 13279, 14010, 14732, 15446, 16151, 16846, 17530,
+  18204, 18868, 19519, 20159, 20787, 21403, 22005, 22594,
+  23170, 23731, 24279, 24811, 25329, 25832, 26319, 26790,
+  27245, 27683, 28105, 28510, 28898, 29268, 29621, 29956,
+  30273, 30571, 30852, 31113, 31356, 31580, 31785, 31971,
+  32137, 32285, 32412, 32521, 32609, 32678, 32728, 32757,
+  32767, 32757
+};
+
+static int16_t Sine(int32_t phase)
+{
+        int16_t s0;
+        uint16_t tmp_phase, tmp_phase_hi;
+
+        tmp_phase = phase & 0x7fff;
+
+        if (tmp_phase & 0x4000)
+                tmp_phase = 0x8000 - tmp_phase;
+
+        tmp_phase_hi = tmp_phase >> 8; // 0...64
+
+        s0 = PW(sin_table[tmp_phase_hi]);
+
+        s0 += ((int16_t)((((int32_t)(PW(sin_table[tmp_phase_hi+1]) - s0))*
+                                    (tmp_phase&0xff))>>8));
+
+        if (phase & 0x8000) {
+                s0 = -s0;
+        }
+
+        return s0;
+}
+
+static int16_t Cosi(int32_t phase)
+{
+    return Sine(phase + 0x4000);
+}
+
+/* by Jim Ulery  http://www.azillionmonkeys.com/qed/ulerysqroot.pdf  */
+static uint32_t isqrt(uint32_t val) {
+    uint32_t temp, g = 0, b = 0x8000, bshft = 15;
+    do {
+        if (val >= (temp = (((g << 1) + b)<<bshft--))) {
+            g += b;
+            val -= temp;
+        }
+    } while (b >>= 1);
+    return g;
+}
+
+static uint16_t isqrt_c16(uint16_t val) {
+    uint16_t temp, g = 0, b = 0x80, bshft = 7;
+    do {
+        if (val >= (temp = (((g << 1) + b)<<bshft--))) {
+            g += b;
+            val -= temp;
+        }
+    } while (b >>= 1);
+    return g;
+}
+
+#include "asmlib.h"
 
 typedef void (*test_func_t)(void);
 
@@ -39,6 +112,14 @@ void float_div_const(void) {
 
 void float_div(void) {
 	c = a / b;
+}
+
+void float_sqrt() {
+	c = sqrt(a);
+}
+
+void float_sin() {
+	c = sin(a);	
 }
 
 unsigned short i_a = 23444, i_b = 23, i_c;
@@ -93,6 +174,25 @@ void int32_mult() {
     l_c = l_a * l_b;
 }
 
+void int32_sqrt() {
+	l_c = isqrt(23442342);
+}
+
+void int32_sqrt_asm() {
+	l_c = isqrt32(23442342);
+}
+
+void int16_sqrt_asm() {
+	l_c = isqrt16(23442);
+}
+
+void int16_sqrt() {
+	l_c = isqrt_c16(23442);
+}
+
+void int16_sin() {
+	l_c = Sine(0x7FFF/6);
+}
 
 #ifdef  __IAR_SYSTEMS_ICC__
 /* This port correponds to the "-W 0x20,-" command line option. */
@@ -142,6 +242,19 @@ static void PrintSignedShortFormated(signed short value) {
     PrintString((const char*) sBuf0); // String ausgeben
 }
 
+
+void print_int16(void) {
+	PrintSignedShortFormated(-32421);
+}
+
+void print_int16_itoa(void) {
+	unsigned char sbuf[7];
+	itoa(-32421, sbuf, 10);
+	PrintString(sbuf);
+}
+
+
+
 /*
 static void PrintSignedShort(signed short value) {
     unsigned char sBuf0[7];
@@ -182,7 +295,7 @@ unsigned short print_execute_time(test_func_t function, char name[]) {
 	TCCR1B = 0; // Timer stoppen
 	// print
 	PrintSignedShortFormated(TCNT1);
-	PrintString(" = ");
+	PrintString(" : ");
 	PrintString(name);
 	if (TIFR & (1 << 2))
 		PrintString(" (Timeroverflow!)");	
@@ -211,6 +324,20 @@ int main() {
 	TIME_FUNC(int32_div16);
 	TIME_FUNC(int32_div);
 	TIME_FUNC(int32_mult_const);
-	TIME_FUNC(int32_mult);		
+	TIME_FUNC(float_sqrt);
+	TIME_FUNC(int16_sqrt);
+	TIME_FUNC(int16_sqrt_asm);	
+	TIME_FUNC(int32_sqrt);
+	TIME_FUNC(int32_sqrt_asm);
+	TIME_FUNC(float_sin);
+	TIME_FUNC(int16_sin);
+	
+	TIME_FUNC(print_int16);
+	TIME_FUNC(print_int16_itoa);
+	PrintString(" - sqrt(23442.0)  = ");
+	PrintSignedShortFormated(sqrt(23442.0));	
+	PrintString("\n - isqrt16(23442) = ");
+	PrintSignedShortFormated(isqrt_c16(23442));
+	PrintString("\n");	
 	return 0;	
 }
