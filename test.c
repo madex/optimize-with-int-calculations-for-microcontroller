@@ -253,6 +253,40 @@ void print_int16_itoa(void) {
 	PrintString(sbuf);
 }
 
+uint16_t buffer[16][16];
+
+void test_loop1() {
+  	uint8_t x, y;
+  	for (x = 0; x < 10; x++) {
+    	for (y = 0; y < 10; y++) {
+     		 buffer[x][y] = 0;
+    	}
+  	}	
+}
+
+void test_loop2() {
+  	uint16_t *ptr = (uint16_t *) buffer; 
+  	uint8_t x;
+  	for (x = 0; x < 10*10; x++) {
+     	*ptr++ = 0;
+  	}
+}
+
+void test_loop3() {
+  	uint16_t *ptr = (uint16_t *) buffer; 
+  	uint8_t x = 10*10;
+  	while (x--) {
+     	*ptr++ = 0;
+  	}
+}
+
+void test_loop4() {
+  	uint8_t x = 10*10-1;
+  	uint16_t *ptr = (uint16_t *) buffer; 
+   	do {
+   		*ptr++ = 0;
+   	} while (--x);
+}
 
 
 /*
@@ -331,6 +365,10 @@ int main() {
 	TIME_FUNC(int32_sqrt_asm);
 	TIME_FUNC(float_sin);
 	TIME_FUNC(int16_sin);
+	TIME_FUNC(test_loop1);
+	TIME_FUNC(test_loop2);
+	TIME_FUNC(test_loop3);
+	TIME_FUNC(test_loop4);
 	
 	TIME_FUNC(print_int16);
 	TIME_FUNC(print_int16_itoa);

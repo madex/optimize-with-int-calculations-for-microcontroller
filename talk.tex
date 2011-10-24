@@ -23,8 +23,6 @@
 % modify this file as you see fit and even to delete this copyright
 % notice. 
 
-
-
 \mode<presentation>
 {
   \usetheme{Copenhagen}
@@ -40,6 +38,13 @@
 
 \usepackage[latin1]{inputenc}
 % oder was auch immer
+
+%\usepackage{pxfonts}
+%\usepackage{listings}
+\usepackage{etex}
+%\usepackage{ngerman}
+\usepackage{xcolor}
+
 
 %\usepackage{times}
 %\usepackage[T1]{fontenc}
@@ -120,54 +125,99 @@
 
 \section{Einleitung}
 
-\subsection[Kurzversion des ersten Unterabschnittstitels]
-{Erster Unterabschnittstitel}
+\subsection{Wann sollte man optimieren?}
 
-\begin{frame}{Überschriften müssen informativ sein.\\
-    Korrekte Groß-/Kleinschreibung beachten.}{Untertitel sind optional.}
-  % - Eine Überschrift fasst einen Rahmen verständlich zusammen. Man
-  %   muss sie verstehen können, selbst wenn man nicht den Rest des
-  %   Rahmens versteht.
+\begin{frame}{Vorsicht vor Optimierungen!}
+\begin{quote}
+Rules of Optimization: \newline
+Rule 1: Don't do it.\newline
+Rule 2 (for experts only): Don't do it yet. \newline
+Michael A. Jackson
+\end{quote}
+
+\pause
+  \begin{itemize}
+  \item Zeitverschwendung \pause
+  \item Wartung und Verständis ist schwerer \pause
+  \item Fehler \pause
+  \item Notwendig? \pause
+  \end{itemize}
+\small{http://www.clean-code-developer.de/Vorsicht-vor-Optimierungen.ashx}
+\end{frame}
+
+\begin{frame}{Wie sollte man vorgehen?}
 
   \begin{itemize}
-  \item
-    Viel \texttt{itemize} benutzen.
-  \item
-    Sehr kurze Sätze oder Satzglieder verwenden.
+ \item Die Software so einfach halten wie möglich.\pause 
+ \item Das Rad nicht neu erfinden.\newline Bibithecksfunktionen sind bereits optimiert und getestet.\pause
+ \item Vermeidung von blockierenden Code. z.B. delay(100);\newline Betriebssystem notwendig? \pause
+ \item Zeit messen.\pause
+ \item Kritische Programmteile finden 
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Überschriften müssen informativ sein.}
+\begin{frame}{Zahlensysteme}
 
-  Man kann Overlays erzeugen\dots
-  \begin{itemize}
-  \item mit dem \texttt{pause}-Befehl:
-    \begin{itemize}
-    \item
-      Erster Punkt.
-      \pause
-    \item    
-      Zweiter Punkt.
-    \end{itemize}
-  \item
-    mittels Overlay-Spezifikationen:
-    \begin{itemize}
-    \item<3->
-      Erster Punkt.
-    \item<4->
-      Zweiter Punkt.
-    \end{itemize}
-  \item
-    mit dem allgemeinen \texttt{uncover}-Befehl:
-    \begin{itemize}
-      \uncover<5->{\item
-        Erster Punkt.}
-      \uncover<6->{\item
-        Zweiter Punkt.}
-    \end{itemize}
-  \end{itemize}
+\begin{tabular}[c] {ccc}
+C-Grundtyp 		& int-Type 	& Wertebeich \\
+\hline
+unsigned char 	& uint8\_t 	& 0 \ldots 255 (0x00 \ldots 0xff) \\
+signed char 		& int8\_t 	& -128 \ldots 127 (0x80 \ldots 0xff, 0 \ldots 0x7f)\\
+unsigned short 	& uint16\_t 	& 0 \ldots 65535 \\
+signed short 		& int16\_t 	& -32.768 \ldots 32.767\\
+unsigned long 	& uint32\_t 	& 0 \ldots 4.294.967.295\\
+signed long 		& int32\_t 	& -2.147.483.648 \ldots 2.147.483.647\\
+\hline
+\\
+unsigned algemein& f\"ur n Bits & $0 \ldots (2^n-1)$ \\
+signed algemein& f\"ur n Bits& $-(2^{n-1}) \ldots (2^{n-1}-1)$ \\
+\end{tabular}
 \end{frame}
 
+\begin{frame}[fragile]{Beispiel unoptimiert}
+\begin{verbatim}
+for (uint8_t t = 0; t < 100; t++) {
+  for (uint8_t x = 0; x < 16; x++) {
+    for (uint8_t y = 0; y < 16; y++) {
+      buffer[x][y] = 566*t*sin(y*y) + t*t*x*x*y/300 +
+                     3*t*t;
+    }
+  }
+  ausgabe(buffer);
+  delay(10);	
+}
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Optimierung Schritt 1}
+\begin{verbatim}
+for (uint8_t t = 0; t < 100; t++) {
+  uint16_t h1 = 566*t, h2 = 3*t*t;
+  for (uint8_t x = 0; x < 16; x++) {
+    uint16_t h3 = t*t*x*x;
+    for (uint8_t y = 0; y < 16; y++) {
+      buffer[x][y] = h1*sin(y*y) + h3*y/300 + h2;
+    }
+  }
+  ausgabe(buffer);
+}
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Optimierung Schritt 2}
+\begin{verbatim}
+for (uint8_t t = 0; t < 100; t++) {
+  uint16_t h1 = 566*t, h2 = 3*t*t;
+  for (uint8_t x = 0; x < 16; x++) {
+    uint16_t h3 = t*t*x*x;
+    for (uint8_t y = 0; y < 16; y++) {
+      buffer[x][y] = h1*sin(y*y) + h3*y/300 + h2;
+    }
+  }
+  ausgabe(buffer);
+}
+\end{verbatim}
+\end{frame}
 
 \subsection{Zweiter Unterabschnittstitel}
 
