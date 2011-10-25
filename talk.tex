@@ -44,7 +44,7 @@
 \usepackage{etex}
 %\usepackage{ngerman}
 \usepackage{xcolor}
-
+\usepackage[retainorgcmds]{IEEEtrantools}
 
 %\usepackage{times}
 %\usepackage[T1]{fontenc}
@@ -70,7 +70,7 @@
 % - Keep it simple, niemand interessiert sich für die genau Adresse.
 
 \date[labortage] % (optional)
-{29.10.20011 / LABORTAGE}
+{29.10.2011 / LABORTAGE}
 
 
 \subject{Iabortalk}
@@ -140,7 +140,7 @@ Michael A. Jackson
   \item Zeitverschwendung \pause
   \item Wartung und Verständis ist schwerer \pause
   \item Fehler \pause
-  \item Notwendig? \pause
+  \item Notwendig?
   \end{itemize}
 \small{http://www.clean-code-developer.de/Vorsicht-vor-Optimierungen.ashx}
 \end{frame}
@@ -190,7 +190,7 @@ for (uint8_t t = 0; t < 100; t++) {
 \end{frame}
 
 \begin{frame}[fragile]{Optimierung Schritt 1}
-Keine Berrechnungen unnötig wiederholen.
+Berrechnungen nicht unnötig wiederholen.
 \begin{verbatim}
 for (uint8_t t = 0; t < 100; t++) {
   uint16_t h1 = 566*t, h2 = t*t; // 256 mal seltener
@@ -237,10 +237,16 @@ $\frac{3\cdot\pi}{2}$&$-1,0$   & 0xC000   & 0x8001 \\
 \end{frame}
 
 \begin{frame}[fragile]{Optimierung Schritt 3}
-Division ist langsam es sei den es wird durch 2er potenzen geteilt.
-
-
-
+Division ist langsam! \newline
+Es sei denn, es wird durch eine 2er Potenzen geteilt.
+\begin{IEEEeqnarray*}{c}
+\frac{\overbrace{53}^k \cdot y}{323} \ 
+\uncover<2->{= \frac{k \cdot c \cdot y}{\underbrace{323 \cdot c}_{2^n}}} 
+\uncover<6->{\alert{\approx \frac{21 \cdot y}{128}}} \\
+\uncover<3->{n = 7 \Rightarrow c = \frac{128}{323}} 
+\uncover<4->{\Rightarrow k \cdot c = \frac{128 \cdot 53}{323} = 21,003096} \\
+\uncover<5->{Fehler = \frac{21 - 21,003096}{21,003096} = 0,0147 \%} 
+\end{IEEEeqnarray*}
 \end{frame}
 
 \subsection{Zweiter Unterabschnittstitel}
