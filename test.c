@@ -1,13 +1,24 @@
 #ifdef  __IAR_SYSTEMS_ICC__
+
 #include <ioavr.h>
+typedef unsigned char  uint8_t;
+typedef   signed char   int8_t;
+typedef unsigned short uint16_t;
+typedef   signed short  int16_t;
+typedef unsigned long  uint32_t;
+typedef   signed long   int32_t;
 #define PROGMEM __flash
 #define PW(a) (a)
+#include <math.h>
+
 #else
+
 #include <avr/io.h>
 #include <stdlib.h>
 #include <math.h>
 #include <avr/pgmspace.h>
 #define PW(a) pgm_read_word(&(a))
+
 #endif
 
 int16_t PROGMEM sin_table[66] = {
@@ -87,7 +98,7 @@ void float_convert_to_float() {
 }
 
 void float_convert_to_int() {
-	d = c;
+	d = (short) c;
 }
 
 void float_add_const(void) {
@@ -122,7 +133,7 @@ void float_sin() {
 	c = sin(a);	
 }
 
-unsigned short i_a = 23444, i_b = 23, i_c;
+unsigned short i_a = 2344, i_b = 23, i_c;
 
 static inline unsigned short div10(unsigned short in) { 
     return (((unsigned long) in * 52429L)) >> 19;
@@ -145,7 +156,7 @@ void int16_div() {
 } 
 
 void int16_mult_const() {
-    i_c = i_a * 234;
+    i_c = i_a * 23;
 } 
 
 void int16_mult() {
@@ -179,15 +190,19 @@ void int32_sqrt() {
 }
 
 void int32_sqrt_asm() {
+#ifndef  __IAR_SYSTEMS_ICC__     
 	l_c = isqrt32(23442342);
+#endif
 }
 
 void int16_sqrt_asm() {
-	l_c = isqrt16(23442);
+#ifndef  __IAR_SYSTEMS_ICC__       
+	i_c = isqrt16(23442);
+#endif        
 }
 
 void int16_sqrt() {
-	l_c = isqrt_c16(23442);
+	i_c = isqrt_c16(23442);
 }
 
 void int16_sin() {
@@ -249,18 +264,29 @@ void print_int16(void) {
 
 void print_int16_itoa(void) {
 	unsigned char sbuf[7];
+#ifndef  __IAR_SYSTEMS_ICC__    
 	itoa(-32421, sbuf, 10);
-	PrintString(sbuf);
+#endif
+	PrintString((const char*) sbuf);
 }
 
-uint16_t buffer[16][16];
+uint16_t buffer[10][10];
+
+void testData() {
+  	uint8_t x, y;
+  	for (x = 0; x < 10; x++) {
+            for (y = 0; y < 10; y++) {
+                buffer[x][y] = x + y*10;
+            }
+  	}	
+}
 
 void test_loop1() {
   	uint8_t x, y;
   	for (x = 0; x < 10; x++) {
-    	for (y = 0; y < 10; y++) {
-     		 buffer[x][y] = 0;
-    	}
+            for (y = 0; y < 10; y++) {
+                buffer[x][y] = 0;
+            }
   	}	
 }
 
@@ -268,7 +294,7 @@ void test_loop2() {
   	uint16_t *ptr = (uint16_t *) buffer; 
   	uint8_t x;
   	for (x = 0; x < 10*10; x++) {
-     	*ptr++ = 0;
+     	    *ptr++ = 0;
   	}
 }
 
@@ -276,17 +302,18 @@ void test_loop3() {
   	uint16_t *ptr = (uint16_t *) buffer; 
   	uint8_t x = 10*10;
   	while (x--) {
-     	*ptr++ = 0;
+     	    *ptr++ = 0;
   	}
 }
 
 void test_loop4() {
-  	uint8_t x = 10*10-1;
+  	uint8_t x = 10*10;
   	uint16_t *ptr = (uint16_t *) buffer; 
    	do {
    		*ptr++ = 0;
    	} while (--x);
 }
+
 
 
 /*
@@ -337,6 +364,14 @@ unsigned short print_execute_time(test_func_t function, char name[]) {
 	return TCNT1;
 }
 
+static void assert_(uint8_t compareTrue, uint16_t line) {
+    if (!compareTrue) {
+      PrintString("Assert Error in Line ");
+      PrintSignedShortFormated(line);
+      PrintString("\n");
+    }
+}
+
 int main() {
 	PrintString("\nZeitmessung Rechenoperationen\n");
 	PrintString("\n Takte   Funktionsname\n");
@@ -349,33 +384,49 @@ int main() {
 	TIME_FUNC(float_div_const);
 	TIME_FUNC(float_div);
 	TIME_FUNC(int16_div10);
+        //assert_(i_c == 234, __LINE__);
 	TIME_FUNC(int16_div10_fast);
+        //assert_(i_c == 234, __LINE__);
 	TIME_FUNC(int16_div16);
 	TIME_FUNC(int16_div);
 	TIME_FUNC(int16_mult_const);
-	TIME_FUNC(int16_mult);	
+        //assert_(i_c == 53912, __LINE__);
+	TIME_FUNC(int16_mult);
+        //assert_(i_c == 53912, __LINE__);	
 	TIME_FUNC(int32_div10);
+        //assert_(l_c == 2344, __LINE__);
 	TIME_FUNC(int32_div16);
 	TIME_FUNC(int32_div);
 	TIME_FUNC(int32_mult_const);
 	TIME_FUNC(float_sqrt);
 	TIME_FUNC(int16_sqrt);
-	TIME_FUNC(int16_sqrt_asm);	
+        //assert_(i_c == 153, __LINE__);
+	TIME_FUNC(int16_sqrt_asm);
+        //assert_(i_c == 153, __LINE__);	
 	TIME_FUNC(int32_sqrt);
+        //assert_(l_c == 4841, __LINE__);
 	TIME_FUNC(int32_sqrt_asm);
+        //assert_(l_c == 4841, __LINE__);
 	TIME_FUNC(float_sin);
 	TIME_FUNC(int16_sin);
+        testData();
 	TIME_FUNC(test_loop1);
-	TIME_FUNC(test_loop2);
-	TIME_FUNC(test_loop3);
-	TIME_FUNC(test_loop4);
-	
+        //assert_(buffer[9][9] == 0, __LINE__);
+	testData();
+        TIME_FUNC(test_loop2);
+        //assert_(buffer[9][9] == 0, __LINE__);
+	testData();
+        TIME_FUNC(test_loop3);
+        //assert_(buffer[9][9] == 0, __LINE__);
+	testData();
+        TIME_FUNC(test_loop4);
+        //assert_(buffer[9][9] == 0, __LINE__);
 	TIME_FUNC(print_int16);
 	TIME_FUNC(print_int16_itoa);
-	PrintString(" - sqrt(23442.0)  = ");
-	PrintSignedShortFormated(sqrt(23442.0));	
-	PrintString("\n - isqrt16(23442) = ");
-	PrintSignedShortFormated(isqrt_c16(23442));
-	PrintString("\n");	
+	//PrintString(" - sqrt(23442.0)  = ");
+	//PrintSignedShortFormated(sqrt(23442.0));	
+	//PrintString("\n - isqrt16(23442) = ");
+	//PrintSignedShortFormated(isqrt_c16(23442));
+	//PrintString("\n");	
 	return 0;	
 }

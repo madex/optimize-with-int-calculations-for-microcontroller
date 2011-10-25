@@ -179,8 +179,8 @@ signed algemein& f\"ur n Bits& $-(2^{n-1}) \ldots (2^{n-1}-1)$ \\
 for (uint8_t t = 0; t < 100; t++) {
   for (uint8_t x = 0; x < 16; x++) {
     for (uint8_t y = 0; y < 16; y++) {
-      buffer[x][y] = 566*t*sin(y*y) + t*t*x*x*y/300 +
-                     3*t*t;
+      buffer[x][y] = 566*t*sin(y*y) + sqrt(t*t*x*x)*y/300 
+                     + 3*t*t;
     }
   }
   ausgabe(buffer);
@@ -190,13 +190,15 @@ for (uint8_t t = 0; t < 100; t++) {
 \end{frame}
 
 \begin{frame}[fragile]{Optimierung Schritt 1}
+Keine Berrechnungen unnötig wiederholen.
 \begin{verbatim}
 for (uint8_t t = 0; t < 100; t++) {
-  uint16_t h1 = 566*t, h2 = 3*t*t;
+  uint16_t h1 = 566*t, h2 = t*t; // 256 mal seltener
+  uint16_t h3 = h2*3; 
   for (uint8_t x = 0; x < 16; x++) {
-    uint16_t h3 = t*t*x*x;
+    uint16_t h4 = sqrt(h2*x*x);  // 16 mal seltener
     for (uint8_t y = 0; y < 16; y++) {
-      buffer[x][y] = h1*sin(y*y) + h3*y/300 + h2;
+      buffer[x][y] = h1*sin(y*y) + h4*y/300 + h3;
     }
   }
   ausgabe(buffer);
@@ -204,19 +206,41 @@ for (uint8_t t = 0; t < 100; t++) {
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile]{Optimierung Schritt 2}
+\begin{frame}[fragile]{Optimierung Schritt 2 - floatingpoint sin ist sehr langsam}
 \begin{verbatim}
-for (uint8_t t = 0; t < 100; t++) {
-  uint16_t h1 = 566*t, h2 = 3*t*t;
-  for (uint8_t x = 0; x < 16; x++) {
-    uint16_t h3 = t*t*x*x;
-    for (uint8_t y = 0; y < 16; y++) {
-      buffer[x][y] = h1*sin(y*y) + h3*y/300 + h2;
-    }
-  }
-  ausgabe(buffer);
+int16_t PROGMEM sin_table[66] = {0, 804, 1608 ... 32757};
+static int16_t Sine(int32_t phase) {
+        int16_t s0;
+        uint16_t tmp_phase= phase & 0x7fff, tmp_phase_hi;
+        if (tmp_phase & 0x4000)
+            tmp_phase = 0x8000 - tmp_phase;
+        tmp_phase_hi = tmp_phase >> 8; // 0...64
+        s0 = PW(sin_table[tmp_phase_hi]);
+        s0 += ((int16_t)((((int32_t)(PW(sin_table[
+          tmp_phase_hi+1]) - s0))*(tmp_phase&0xff))>>8));
+        if (phase & 0x8000)  s0 = -s0;
+        return s0;
 }
 \end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile]{Optimierung Schritt 2}
+\begin{tabular}[c] {cccc}
+float sin in 	& float sin out  & int sin in & int sin out \\
+\hline
+$0,0$		& $0,0$	        & 0        & 0 \\
+$\frac{\pi}{2}$&$1,0$	        & 0x4000   & 0x7FFF \\
+$\frac{3\cdot\pi}{2}$&$-1,0$   & 0xC000   & 0x8001 \\
+\end{tabular}
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Optimierung Schritt 3}
+Division ist langsam es sei den es wird durch 2er potenzen geteilt.
+
+
+
 \end{frame}
 
 \subsection{Zweiter Unterabschnittstitel}
