@@ -209,6 +209,10 @@ void int16_sin() {
 	l_c = Sine(0x7FFF/6);
 }
 
+
+void empty_func() {
+}
+
 #define MAX_U_STELL 1000L
 int16_t v_soll = 100, v_ist = 80, u_stell;
 
@@ -361,6 +365,7 @@ static void PrintSignedShort(signed short value) {
 }
 */
 
+// typedef void (*test_func_t)(void);
 #define TIME_FUNC(func) print_execute_time(func, "" # func) 
 
 unsigned short print_execute_time(test_func_t function, char name[]) {
@@ -372,7 +377,6 @@ unsigned short print_execute_time(test_func_t function, char name[]) {
 	TCCR1B = 1; // prescaler 1 Timer starten
 	function();
 	TCCR1B = 0; // Timer stoppen
-	// print
 	PrintSignedShortFormated(TCNT1);
 	PrintString(" : ");
 	PrintString(name);
@@ -402,44 +406,45 @@ int main() {
 	TIME_FUNC(float_div_const);
 	TIME_FUNC(float_div);
 	TIME_FUNC(int16_div10);
-        //assert_(i_c == 234, __LINE__);
+    //assert_(i_c == 234, __LINE__);
 	TIME_FUNC(int16_div10_fast);
-        //assert_(i_c == 234, __LINE__);
+    //assert_(i_c == 234, __LINE__);
 	TIME_FUNC(int16_div16);
 	TIME_FUNC(int16_div);
 	TIME_FUNC(int16_mult_const);
-        //assert_(i_c == 53912, __LINE__);
+    //assert_(i_c == 53912, __LINE__);
 	TIME_FUNC(int16_mult);
-        //assert_(i_c == 53912, __LINE__);	
+    //assert_(i_c == 53912, __LINE__);	
 	TIME_FUNC(int32_div10);
-        //assert_(l_c == 2344, __LINE__);
+    //assert_(l_c == 2344, __LINE__);
 	TIME_FUNC(int32_div16);
 	TIME_FUNC(int32_div);
 	TIME_FUNC(int32_mult_const);
 	TIME_FUNC(float_sqrt);
 	TIME_FUNC(int16_sqrt);
-        //assert_(i_c == 153, __LINE__);
+    //assert_(i_c == 153, __LINE__);
 	TIME_FUNC(int16_sqrt_asm);
-        //assert_(i_c == 153, __LINE__);	
+    //assert_(i_c == 153, __LINE__);	
 	TIME_FUNC(int32_sqrt);
-        //assert_(l_c == 4841, __LINE__);
+    //assert_(l_c == 4841, __LINE__);
 	TIME_FUNC(int32_sqrt_asm);
-        //assert_(l_c == 4841, __LINE__);
+    //assert_(l_c == 4841, __LINE__);
 	TIME_FUNC(float_sin);
 	TIME_FUNC(int16_sin);
-        testData();
+    testData();
 	TIME_FUNC(test_loop1);
-        //assert_(buffer[9][9] == 0, __LINE__);
+    //assert_(buffer[9][9] == 0, __LINE__);
 	testData();
-        TIME_FUNC(test_loop2);
-        //assert_(buffer[9][9] == 0, __LINE__);
+    TIME_FUNC(test_loop2);
+    //assert_(buffer[9][9] == 0, __LINE__);
 	testData();
-        TIME_FUNC(test_loop3);
-        //assert_(buffer[9][9] == 0, __LINE__);
+    TIME_FUNC(test_loop3);
+    //assert_(buffer[9][9] == 0, __LINE__);
 	testData();
-        TIME_FUNC(test_loop4);
-        //assert_(buffer[9][9] == 0, __LINE__);
+    TIME_FUNC(test_loop4);
+    assert_(buffer[9][9] == 0, __LINE__);
     TIME_FUNC(int16_pi_regler);    
+	TIME_FUNC(empty_func);  
 	TIME_FUNC(print_int16);
 	TIME_FUNC(print_int16_itoa);
 	//PrintString(" - sqrt(23442.0)  = ");

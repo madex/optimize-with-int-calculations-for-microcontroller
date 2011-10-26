@@ -174,17 +174,43 @@ signed algemein& f\"ur n Bits& $-(2^{n-1}) \ldots (2^{n-1}-1)$ \\
 \end{tabular}
 \end{frame}
 
+\begin{frame}{Zeit messen}
+
+\begin{itemize}
+ \item Auf das Wesentliche beschränken.\pause 
+ \item Störer abschalten, z.B. Interrupts.\pause
+ \item Einen Timer zu zeit messen verwenden.\pause
+ \item Ich hab da mal was vorbeireitet.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Zeit messen von Funktionen}
+\begin{verbatim}
+#define TIME_FUNC(func) print_execute_time(func,""#func) 
+typedef void (*test_func_t)(void);
+void print_execute_time(test_func_t func, char name[]) {
+  TCCR1A = 0; TCCR1B = 0; TCNT1 = 0; TIFR  = 0; 
+  TCCR1B = 1; // prescaler 1 Timer starten
+  func();
+  TCCR1B = 0; // Timer stoppen
+  PrintSignedShortFormated(TCNT1);
+  PrintString(" : ");
+  PrintString(name);	
+  PrintString("\n");
+}
+\end{verbatim}
+\end{frame}
+
 \begin{frame}[fragile]{Beispiel unoptimiert}
 \begin{verbatim}
 for (uint8_t t = 0; t < 100; t++) {
   for (uint8_t x = 0; x < 16; x++) {
     for (uint8_t y = 0; y < 16; y++) {
-      buffer[x][y] = 566*t*sin(y*y) + sqrt(t*t*x*x)*y/300 
+      buffer[x][y] = sqrt(t*t*x*x)*sin(y*y) + 566*t*y/300 
                      + 3*t*t;
     }
   }
   ausgabe(buffer);
-  delay(10);	
 }
 \end{verbatim}
 \end{frame}
@@ -193,12 +219,12 @@ for (uint8_t t = 0; t < 100; t++) {
 Berrechnungen nicht unnötig wiederholen.
 \begin{verbatim}
 for (uint8_t t = 0; t < 100; t++) {
-  uint16_t h1 = 566*t, h2 = t*t; // 256 mal seltener
-  uint16_t h3 = h2*3; 
+  uint32_t h1 = 566L*t, h2 = t*t; // 256 mal seltener
+  uint32_t h3 = h2*3; 
   for (uint8_t x = 0; x < 16; x++) {
     uint16_t h4 = sqrt(h2*x*x);  // 16 mal seltener
     for (uint8_t y = 0; y < 16; y++) {
-      buffer[x][y] = h1*sin(y*y) + h4*y/300 + h3;
+      buffer[x][y] = h4*sin(y*y) + h1*y/300 + h3;
     }
   }
   ausgabe(buffer);
@@ -206,20 +232,32 @@ for (uint8_t t = 0; t < 100; t++) {
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile]{Erweitern}
+\begin{frame}[fragile]{Optimierung Schritt 2}
+Division ist langsam! \newline
+Es sei denn, es wird durch eine 2er Potenzen geteilt.
+\begin{IEEEeqnarray*}{c}
+\frac{\overbrace{566}^k \cdot t \cdot y}{300} \ 
+\uncover<2->{= \frac{k \cdot c \cdot t \cdot y}{\underbrace{300 \cdot c}_{2^n}}} 
+\uncover<6->{\alert{\approx \frac{483 \cdot t}{256}}} \\
+\uncover<3->{n = 8 \Rightarrow c = \frac{256}{300}} 
+\uncover<4->{\Rightarrow k \cdot c = \frac{256 \cdot 566}{300} = 482,9866} \\
+\uncover<5->{Fehler = \frac{482,9866 - 483}{482,9866} = 0,00276 \%} 
+\end{IEEEeqnarray*}
+\end{frame}
+
+\begin{frame}[fragile]{Optimierung Schritt 3}
+Berrechnungen nicht unnötig wiederholen.
 \begin{verbatim}
-int16_t PROGMEM sin_table[66] = {0, 804, 1608 ... 32757};
-static int16_t Sine(int32_t phase) {
-    int16_t s0;
-    uint16_t tmp_phase= phase & 0x7fff, tmp_phase_hi;
-    if (tmp_phase & 0x4000) //90 bis 180° 240 bis 360° 
-        tmp_phase = 0x8000 - tmp_phase; //Tab. rückwärts
-    tmp_phase_hi = tmp_phase >> 8; // 0...64
-    s0 = PW(sin_table[tmp_phase_hi]); // Star
-    s0 += ((int16_t)((((int32_t)(PW(sin_table[tmp_phase_hi+1]) 
-          - s0))*(tmp_phase&0xff))>>8)); // interpolieren
-    if (phase & 0x8000)  s0 = -s0; // Sinus ab 180° negativ
-    return s0;
+for (uint8_t t = 0; t < 100; t++) {
+  uint32_t h1 = ((256*566+150)/300)*t, h2 = t*t; 
+  uint32_t h3 = h2*3; 
+  for (uint8_t x = 0; x < 16; x++) {
+    uint16_t h4 = sqrt(h2*x*x);  // 16 mal seltener
+    for (uint8_t y = 0; y < 16; y++) {
+      buffer[x][y] = h4*sin(y*y) + ((h1*y) >> 8) + h3;
+    }
+  }
+  ausgabe(buffer);
 }
 \end{verbatim}
 \end{frame}
@@ -227,40 +265,22 @@ static int16_t Sine(int32_t phase) {
 \begin{frame}[fragile]{Lookuptable mit Interpolation}
 \begin{verbatim}
 int16_t PROGMEM sin_table[66] = {0, 804, 1608 ... 32757};
-static int16_t Sine(int32_t phase) {
+static int16_t Sine(uint16_t phase) {
     int16_t s0;
     uint16_t tmp_phase= phase & 0x7fff, tmp_phase_hi;
     if (tmp_phase & 0x4000) //90 bis 180° 240 bis 360° 
         tmp_phase = 0x8000 - tmp_phase; //Tab. rückwärts
     tmp_phase_hi = tmp_phase >> 8; // 0...64
     s0 = PW(sin_table[tmp_phase_hi]); // Star
-    s0 += ((int16_t)((((int32_t)(PW(sin_table[tmp_phase_hi+1]) 
-          - s0))*(tmp_phase&0xff))>>8)); // interpolieren
+    s0 += ((int16_t)((((int32_t)(PW(sin_table[
+         tmp_phase_hi+1]) - s0))*(tmp_phase&0xff))>>8));
     if (phase & 0x8000)  s0 = -s0; // Sinus ab 180° negativ
     return s0;
 }
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile]{Integer Sinus}
-\begin{verbatim}
-int16_t PROGMEM sin_table[66] = {0, 804, 1608 ... 32757};
-static int16_t Sine(int32_t phase) {
-    int16_t s0;
-    uint16_t tmp_phase= phase & 0x7fff, tmp_phase_hi;
-    if (tmp_phase & 0x4000) //90 bis 180° 240 bis 360° 
-        tmp_phase = 0x8000 - tmp_phase; //Tab. rückwärts
-    tmp_phase_hi = tmp_phase >> 8; // 0...64
-    s0 = PW(sin_table[tmp_phase_hi]);
-    s0 += ((int16_t)((((int32_t)(PW(sin_table[tmp_phase_hi+1]) 
-          - s0))*(tmp_phase&0xff))>>8));
-    if (phase & 0x8000)  s0 = -s0;
-    return s0;
-}
-\end{verbatim}
-\end{frame}
-
-\begin{frame}[fragile]{Optimierung Schritt 2}
+\begin{frame}[fragile]{Benutzen des Sinus}
 \begin{tabular}[c] {cccc}
 float sin in 	& float sin out  & int sin in & int sin out \\
 \hline
@@ -268,22 +288,27 @@ $0,0$		& $0,0$	        & 0        & 0 \\
 $\frac{\pi}{2}$&$1,0$	        & 0x4000   & 0x7FFF \\
 $\frac{3\cdot\pi}{2}$&$-1,0$   & 0xC000   & 0x8001 \\
 \end{tabular}
-
-
+Sine(x\_int)   sin(x)
+Umwandlung $ \frac{x \cdot 0x7fff}{\pi} = 10430,06 $ 
 \end{frame}
 
-\begin{frame}[fragile]{Optimierung Schritt 3}
-Division ist langsam! \newline
-Es sei denn, es wird durch eine 2er Potenzen geteilt.
-\begin{IEEEeqnarray*}{c}
-\frac{\overbrace{53}^k \cdot y}{323} \ 
-\uncover<2->{= \frac{k \cdot c \cdot y}{\underbrace{323 \cdot c}_{2^n}}} 
-\uncover<6->{\alert{\approx \frac{21 \cdot y}{128}}} \\
-\uncover<3->{n = 7 \Rightarrow c = \frac{128}{323}} 
-\uncover<4->{\Rightarrow k \cdot c = \frac{128 \cdot 53}{323} = 21,003096} \\
-\uncover<5->{Fehler = \frac{21 - 21,003096}{21,003096} = 0,0147 \%} 
-\end{IEEEeqnarray*}
+\begin{frame}[fragile]{Optimierung Schritt 4}
+\begin{verbatim}
+for (uint8_t t = 0; t < 100; t++) {
+  uint32_t h1 = ((256*566+150)/300)*t, h2 = t*t; 
+  uint32_t h3 = h2*3; 
+  for (uint8_t x = 0; x < 16; x++) {
+    uint32_t h4 = isqrt32(h2*x*x);  // 16 mal seltener
+    for (uint8_t y = 0; y < 16; y++) {
+      buffer[x][y] = (h4*Sine(10430L*y*y)) >> 15) + 
+                     ((h1*y) >> 8) + h3;
+    }
+  }
+  ausgabe(buffer);
+}
+\end{verbatim}
 \end{frame}
+
 
 \subsection{Zweiter Unterabschnittstitel}
 
@@ -297,28 +322,6 @@ Es sei denn, es wird durch eine 2er Potenzen geteilt.
 
 \begin{frame}{Zusammenfassung}
 
-  % Die Zusammenfassung sollte sehr kurz sein.
-  \begin{itemize}
-  \item
-    Die \alert{erste Hauptbotschaft} des Vortrags in ein bis zwei Zeilen.
-  \item
-    Die \alert{zweite Hauptbotschaft} des Vortrags in ein bis zwei Zeilen.
-  \item
-    Eventuell noch eine \alert{dritte Botschaft}, aber nicht noch mehr.
-  \end{itemize}
-  
-  % Der folgende Ausblick ist optional.
-  \vskip0pt plus.5fill
-  \begin{itemize}
-  \item
-    Ausblick
-    \begin{itemize}
-    \item
-      Etwas, was wir noch nicht lösen konnten.
-    \item
-      Nochwas, das wir noch nicht lösen konnten.
-    \end{itemize}
-  \end{itemize}
 \end{frame}
 
 
