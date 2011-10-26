@@ -209,6 +209,24 @@ void int16_sin() {
 	l_c = Sine(0x7FFF/6);
 }
 
+#define MAX_U_STELL 1000L
+int16_t v_soll = 100, v_ist = 80, u_stell;
+
+void int16_pi_regler() {
+	static int32_t u_stell_l = 0;
+	static int16_t reg_abw, reg_abw_old;
+        static uint8_t kp = 50, ki = 15;
+        reg_abw = (v_soll - v_ist);
+	// PI-Regeler Geschwindigkeitsalgorithmus 
+	u_stell_l  += reg_abw*kp + ((reg_abw*ki + 16) >> 5) - reg_abw_old*kp;
+	if (u_stell_l > (MAX_U_STELL << 5))
+            u_stell_l = MAX_U_STELL << 5;
+        else if (u_stell_l < -(MAX_U_STELL << 5))
+            u_stell_l = -(MAX_U_STELL << 5); 
+        u_stell     = u_stell_l >> 5;
+	reg_abw_old = reg_abw; 
+}
+
 #ifdef  __IAR_SYSTEMS_ICC__
 /* This port correponds to the "-W 0x20,-" command line option. */
 #define special_output_port (*((__io *) SIM_WIO))
@@ -421,6 +439,7 @@ int main() {
 	testData();
         TIME_FUNC(test_loop4);
         //assert_(buffer[9][9] == 0, __LINE__);
+    TIME_FUNC(int16_pi_regler);    
 	TIME_FUNC(print_int16);
 	TIME_FUNC(print_int16_itoa);
 	//PrintString(" - sqrt(23442.0)  = ");
