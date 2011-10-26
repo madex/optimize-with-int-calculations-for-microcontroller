@@ -206,6 +206,23 @@ for (uint8_t t = 0; t < 100; t++) {
 \end{verbatim}
 \end{frame}
 
+\begin{frame}[fragile]{Erweitern}
+\begin{verbatim}
+int16_t PROGMEM sin_table[66] = {0, 804, 1608 ... 32757};
+static int16_t Sine(int32_t phase) {
+    int16_t s0;
+    uint16_t tmp_phase= phase & 0x7fff, tmp_phase_hi;
+    if (tmp_phase & 0x4000) //90 bis 180° 240 bis 360° 
+        tmp_phase = 0x8000 - tmp_phase; //Tab. rückwärts
+    tmp_phase_hi = tmp_phase >> 8; // 0...64
+    s0 = PW(sin_table[tmp_phase_hi]); // Star
+    s0 += ((int16_t)((((int32_t)(PW(sin_table[tmp_phase_hi+1]) 
+          - s0))*(tmp_phase&0xff))>>8)); // interpolieren
+    if (phase & 0x8000)  s0 = -s0; // Sinus ab 180° negativ
+    return s0;
+}
+\end{verbatim}
+\end{frame}
 
 \begin{frame}[fragile]{Lookuptable mit Interpolation}
 \begin{verbatim}
