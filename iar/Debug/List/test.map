@@ -1,8 +1,8 @@
 ################################################################################
 #                                                                              #
-#      IAR Universal Linker V4.61L/W32                                         #
+#      IAR Universal Linker V5.2.3.14                                          #
 #                                                                              #
-#           Link time     =  26/Oct/2011  17:42:00                             #
+#           Link time     =  27/Oct/2011  13:47:05                             #
 #           Target CPU    =  A90                                               #
 #           List file     =  D:\Devel\git\optimize-with-int-calculations-for-m #
 #                            icrocontroller\iar\Debug\List\test.map            #
@@ -22,11 +22,11 @@
 #                            D:\Devel\git\optimize-with-int-calculations-for-m #
 #                            icrocontroller\iar\Debug\List\test.map            #
 #                            -xms                                              #
-#                            "-IC:\Programme\IAR Systems\Embedded Workbench 5. #
-#                            51\avr\LIB\"                                      #
+#                            "-IC:\Programme\IAR Systems\Embedded Workbench 6. #
+#                            0\avr\LIB\"                                       #
 #                            -f                                                #
-#                            "C:\Programme\IAR Systems\Embedded Workbench 5.51 #
-#                            \avr\src\template\cfgm128.xcl"                    #
+#                            "C:\Programme\IAR Systems\Embedded Workbench 6.0\ #
+#                            avr\src\template\cfgm128.xcl"                     #
 #                            (-D_..X_INTVEC_SIZE=8C -D_..X_FLASH_NEND=FFFF     #
 #                            -D_..X_FLASH_END=1FFFF -D_..X_SRAM_BASE=100       #
 #                            -D_..X_SRAM_TBASE=0 -D_..X_SRAM_TSIZE=0           #
@@ -34,9 +34,10 @@
 #                            -D_..X_EEPROM_START=0) -D_..X_HEAP_SIZE=10        #
 #                            -D_..X_TINY_HEAP_SIZE=0 -D_..X_NEAR_HEAP_SIZE=0   #
 #                            -D_..X_FAR_HEAP_SIZE=0 -D_..X_HUGE_HEAP_SIZE=0    #
-#                            -D_..X_CSTACK_SIZE=20 -D_..X_RSTACK_SIZE=20 -f    #
-#                            "C:\Programme\IAR Systems\Embedded Workbench 5.51 #
-#                            \avr\src\template\cfg3soim.xcl"                   #
+#                            -D_..X_CSTACK_SIZE=20 -D_..X_RSTACK_SIZE=20       #
+#                            -D_..X_FLASH_CODE_END=1FFFF -f                    #
+#                            "C:\Programme\IAR Systems\Embedded Workbench 6.0\ #
+#                            avr\src\template\cfg3soim.xcl"                    #
 #                            (-ca90 -w29                                       #
 #                            -Z(CODE)INTVEC=0-(_..X_INTVEC_SIZE-1)             #
 #                            -Z(CODE)TINY_F=_..X_FLASH_BASE-FF                 #
@@ -44,7 +45,7 @@
 #                            -Z(CODE)SWITCH=_..X_FLASH_BASE-_..X_FLASH_NEND    #
 #                            -Z(CODE)DIFUNCT=_..X_FLASH_BASE-_..X_FLASH_NEND   #
 #                            -Z(CODE)CODE=_..X_FLASH_BASE-_..X_FLASH_END       #
-#                            -Z(CODE)FAR_F=[_..X_FLASH_BASE-_..X_FLASH_END]/10 #
+#                            -P(CODE)FAR_F=[_..X_FLASH_BASE-_..X_FLASH_END]/10 #
 #                            000                                               #
 #                            -Z(CODE)INITTAB=_..X_FLASH_BASE-_..X_FLASH_END    #
 #                            -Z(CODE)HUGE_F=_..X_FLASH_BASE-_..X_FLASH_END     #
@@ -82,10 +83,12 @@
 #                            alculations-for-microcontroller\iar\Debug\Exe\tes #
 #                            t.hex                                             #
 #                            -s __program_start                                #
-#                            "C:\Programme\IAR Systems\Embedded Workbench 5.51 #
-#                            \avr\LIB\CLIB\cl3s-ec_mul.r90"                    #
+#                            "C:\Programme\IAR Systems\Embedded Workbench 6.0\ #
+#                            avr\LIB\CLIB\cl3s-ec_mul.r90"                     #
+#                            -e_large_write=_formatted_write                   #
+#                            -e_large_read=_formatted_read                     #
 #                                                                              #
-#                           Copyright (C) 1987-2009 IAR Systems AB.            #
+#                           Copyright (C) 1987-2011 IAR Systems AB.            #
 ################################################################################
 
 
@@ -118,6 +121,7 @@
   R8              = REG
   R9              = REG
   __64bit_doubles = disabled
+  __SystemLibrary = CLib
   __cpu           = 3
   __cpu_name      = ATmega128
   __enhanced_core = enabled
@@ -126,6 +130,14 @@
   __no_rampd      = enabled
   __rt_version    = 3
   __tiny_avr      = false
+
+                ****************************************
+                *                                      *
+                *    AUTOMATIC SYMBOL REDIRECTIONS     *
+                *                                      *
+                ****************************************
+
+                  There are no automatic symbol redirections.
 
 
 
@@ -153,6 +165,7 @@ Absolute parts
            _..X_EXT_SRAM_SIZE      00000000 
            _..X_EXT_SRAM_BASE      000010FF 
            _..X_FLASH_BASE         0000008C 
+           _..X_FLASH_CODE_END     0001FFFF 
            _..X_RSTACK_SIZE        00000020 
            _..X_CSTACK_SIZE        00000020 
            _..X_HUGE_HEAP_SIZE     00000000 
@@ -182,6 +195,11 @@ ABSOLUTE
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            _A_TCNT1                0000004C 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           TCNT1                   0000004C 
+           TCNT1H                  0000004D 
+           TCNT1L                  0000004C 
     -------------------------------------------------------------------------
 ABSOLUTE
   Relative segment, address: DATA 0000004E - 0000004E (0x1 bytes), align: 0
@@ -189,6 +207,9 @@ ABSOLUTE
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            _A_TCCR1B               0000004E 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           TCCR1B                  0000004E 
     -------------------------------------------------------------------------
 ABSOLUTE
   Relative segment, address: DATA 0000004F - 0000004F (0x1 bytes), align: 0
@@ -196,6 +217,9 @@ ABSOLUTE
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            _A_TCCR1A               0000004F 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           TCCR1A                  0000004F 
     -------------------------------------------------------------------------
 ABSOLUTE
   Relative segment, address: DATA 00000056 - 00000056 (0x1 bytes), align: 0
@@ -203,17 +227,20 @@ ABSOLUTE
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            _A_TIFR                 00000056 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           TIFR                    00000056 
     -------------------------------------------------------------------------
 NEAR_F
   Relative segment, address: CODE 0000008C - 0000010F (0x84 bytes), align: 0
-  Segment part 16.            Intra module refs:   Sine
+  Segment part 14.            Intra module refs:   Sine
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            sin_table               0000008C 
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 00000110 - 0000017D (0x6e bytes), align: 1
-  Segment part 27.            Intra module refs:   int16_sin
+  Segment part 25.            Intra module refs:   int16_sin
            LOCAL                   ADDRESS         
            =====                   =======         
            Sine                    00000110 
@@ -222,7 +249,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 0000017E - 000001FD (0x80 bytes), align: 1
-  Segment part 28.            Intra module refs:   int32_sqrt
+  Segment part 26.            Intra module refs:   int32_sqrt
            LOCAL                   ADDRESS         
            =====                   =======         
            isqrt                   0000017E 
@@ -231,23 +258,19 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000001FE - 0000023B (0x3e bytes), align: 1
-  Segment part 29.            Intra module refs:   int16_sqrt
+  Segment part 27.            Intra module refs:   int16_sqrt
            LOCAL                   ADDRESS         
            =====                   =======         
            isqrt_c16               000001FE 
                RSTACK = 00000000 ( 00000004 )
     -------------------------------------------------------------------------
 NEAR_I
-  Relative segment, address: DATA 00000140 - 00000157 (0x18 bytes), align: 0
-  Segment part 11.            Intra module refs:   print_execute_time
+  Relative segment, address: DATA 00000140 - 000002F2 (0x1b3 bytes), align: 0
+  Segment part 11.            Intra module refs:   main
     -------------------------------------------------------------------------
 NEAR_I
-  Relative segment, address: DATA 00000158 - 00000338 (0x1e1 bytes), align: 0
-  Segment part 14.            Intra module refs:   main
-    -------------------------------------------------------------------------
-NEAR_I
-  Relative segment, address: DATA 00000339 - 00000346 (0xe bytes), align: 0
-  Segment part 17.            Intra module refs:   float_add
+  Relative segment, address: DATA 000002F3 - 00000300 (0xe bytes), align: 0
+  Segment part 15.            Intra module refs:   float_add
                                                    float_add_const
                                                    float_convert_to_float
                                                    float_convert_to_int
@@ -259,14 +282,14 @@ NEAR_I
                                                    float_sqrt
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           a                       00000339 
-           b                       0000033D 
-           c                       00000341 
-           d                       00000345 
+           a                       000002F3 
+           b                       000002F7 
+           c                       000002FB 
+           d                       000002FF 
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 0000023C - 0000025F (0x24 bytes), align: 1
-  Segment part 30.            Intra module refs:   main
+  Segment part 28.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            float_convert_to_float
@@ -275,7 +298,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 00000260 - 0000027D (0x1e bytes), align: 1
-  Segment part 31.            Intra module refs:   main
+  Segment part 29.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            float_convert_to_int    00000260 
@@ -283,7 +306,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 0000027E - 0000029D (0x20 bytes), align: 1
-  Segment part 32.            Intra module refs:   main
+  Segment part 30.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            float_add_const         0000027E 
@@ -292,7 +315,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 0000029E - 000002BF (0x22 bytes), align: 1
-  Segment part 33.            Intra module refs:   main
+  Segment part 31.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            float_add               0000029E 
@@ -301,7 +324,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000002C0 - 000002DF (0x20 bytes), align: 1
-  Segment part 34.            Intra module refs:   main
+  Segment part 32.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            float_mul_const         000002C0 
@@ -310,7 +333,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000002E0 - 000002ED (0xe bytes), align: 1
-  Segment part 35.            Intra module refs:   float_div
+  Segment part 33.            Intra module refs:   float_div
                                                    float_div_const
            LOCAL                   ADDRESS         
            =====                   =======         
@@ -318,7 +341,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000002EE - 000002FB (0xe bytes), align: 1
-  Segment part 36.            Intra module refs:   ?Subroutine0
+  Segment part 34.            Intra module refs:   ?Subroutine0
                                                    float_add
                                                    float_add_const
                                                    float_mul
@@ -328,7 +351,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000002FC - 0000031D (0x22 bytes), align: 1
-  Segment part 37.            Intra module refs:   main
+  Segment part 35.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            float_mul               000002FC 
@@ -337,7 +360,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 0000031E - 0000032F (0x12 bytes), align: 1
-  Segment part 38.            Intra module refs:   main
+  Segment part 36.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            float_div_const         0000031E 
@@ -346,7 +369,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 00000330 - 00000343 (0x14 bytes), align: 1
-  Segment part 39.            Intra module refs:   main
+  Segment part 37.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            float_div               00000330 
@@ -355,7 +378,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 00000344 - 0000035B (0x18 bytes), align: 1
-  Segment part 40.            Intra module refs:   main
+  Segment part 38.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            float_sqrt              00000344 
@@ -365,7 +388,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 0000035C - 00000373 (0x18 bytes), align: 1
-  Segment part 41.            Intra module refs:   main
+  Segment part 39.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            float_sin               0000035C 
@@ -374,8 +397,8 @@ CODE
                CSTACK = 00000000 ( 00000002 )
     -------------------------------------------------------------------------
 NEAR_I
-  Relative segment, address: DATA 00000347 - 0000034C (0x6 bytes), align: 0
-  Segment part 19.            Intra module refs:   int16_div
+  Relative segment, address: DATA 00000301 - 00000306 (0x6 bytes), align: 0
+  Segment part 17.            Intra module refs:   int16_div
                                                    int16_div10
                                                    int16_div10_fast
                                                    int16_div16
@@ -384,13 +407,13 @@ NEAR_I
                                                    int16_sqrt
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           i_a                     00000347 
-           i_b                     00000349 
-           i_c                     0000034B 
+           i_a                     00000301 
+           i_b                     00000303 
+           i_c                     00000305 
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 00000374 - 0000037D (0xa bytes), align: 1
-  Segment part 42.            Intra module refs:   main
+  Segment part 40.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int16_div10             00000374 
@@ -399,7 +422,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 0000037E - 0000038F (0x12 bytes), align: 1
-  Segment part 43.            Intra module refs:   int16_div
+  Segment part 41.            Intra module refs:   int16_div
                                                    int16_div10
            LOCAL                   ADDRESS         
            =====                   =======         
@@ -407,7 +430,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 00000390 - 000003BB (0x2c bytes), align: 1
-  Segment part 44.            Intra module refs:   main
+  Segment part 42.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int16_div10_fast        00000390 
@@ -415,7 +438,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000003BC - 000003CD (0x12 bytes), align: 1
-  Segment part 45.            Intra module refs:   int16_div10_fast
+  Segment part 43.            Intra module refs:   int16_div10_fast
                                                    int16_div16
            LOCAL                   ADDRESS         
            =====                   =======         
@@ -423,7 +446,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000003CE - 000003DB (0xe bytes), align: 1
-  Segment part 46.            Intra module refs:   main
+  Segment part 44.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int16_div16             000003CE 
@@ -431,7 +454,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000003DC - 000003E9 (0xe bytes), align: 1
-  Segment part 47.            Intra module refs:   main
+  Segment part 45.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int16_div               000003DC 
@@ -440,7 +463,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000003EA - 00000401 (0x18 bytes), align: 1
-  Segment part 48.            Intra module refs:   main
+  Segment part 46.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int16_mult_const        000003EA 
@@ -448,15 +471,15 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 00000402 - 0000041F (0x1e bytes), align: 1
-  Segment part 49.            Intra module refs:   main
+  Segment part 47.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int16_mult              00000402 
                RSTACK = 00000000 ( 00000002 )
     -------------------------------------------------------------------------
 NEAR_I
-  Relative segment, address: DATA 0000034D - 00000358 (0xc bytes), align: 0
-  Segment part 21.            Intra module refs:   int16_sin
+  Relative segment, address: DATA 00000307 - 00000312 (0xc bytes), align: 0
+  Segment part 19.            Intra module refs:   int16_sin
                                                    int32_div
                                                    int32_div10
                                                    int32_div16
@@ -464,13 +487,13 @@ NEAR_I
                                                    int32_sqrt
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           l_a                     0000034D 
-           l_b                     00000351 
-           l_c                     00000355 
+           l_a                     00000307 
+           l_b                     0000030B 
+           l_c                     0000030F 
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 00000420 - 0000042F (0x10 bytes), align: 1
-  Segment part 50.            Intra module refs:   main
+  Segment part 48.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int32_div10             00000420 
@@ -479,7 +502,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 00000430 - 0000044B (0x1c bytes), align: 1
-  Segment part 51.            Intra module refs:   int32_div
+  Segment part 49.            Intra module refs:   int32_div
                                                    int32_div10
            LOCAL                   ADDRESS         
            =====                   =======         
@@ -487,7 +510,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 0000044C - 0000045D (0x12 bytes), align: 1
-  Segment part 52.            Intra module refs:   main
+  Segment part 50.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int32_div16             0000044C 
@@ -495,7 +518,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 0000045E - 0000045F (0x2 bytes), align: 1
-  Segment part 53.            Intra module refs:   int32_div16
+  Segment part 51.            Intra module refs:   int32_div16
                                                    int32_sqrt
            LOCAL                   ADDRESS         
            =====                   =======         
@@ -503,12 +526,12 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 00000460 - 00000467 (0x8 bytes), align: 1
-  Segment part 54.            Intra module refs:   ?Subroutine5
+  Segment part 52.            Intra module refs:   ?Subroutine5
                                                    int32_mult_const
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 00000468 - 0000047B (0x14 bytes), align: 1
-  Segment part 55.            Intra module refs:   main
+  Segment part 53.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int32_div               00000468 
@@ -517,7 +540,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 0000047C - 000004A9 (0x2e bytes), align: 1
-  Segment part 56.            Intra module refs:   main
+  Segment part 54.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int32_mult_const        0000047C 
@@ -525,7 +548,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000004AA - 000004B9 (0x10 bytes), align: 1
-  Segment part 58.            Intra module refs:   main
+  Segment part 56.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int32_sqrt              000004AA 
@@ -534,7 +557,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000004BA - 000004BB (0x2 bytes), align: 1
-  Segment part 59.            Intra module refs:   main
+  Segment part 57.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int32_sqrt_asm          000004BA 
@@ -542,7 +565,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000004BC - 000004BD (0x2 bytes), align: 1
-  Segment part 60.            Intra module refs:   main
+  Segment part 58.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int16_sqrt_asm          000004BC 
@@ -550,7 +573,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000004BE - 000004CD (0x10 bytes), align: 1
-  Segment part 61.            Intra module refs:   main
+  Segment part 59.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int16_sqrt              000004BE 
@@ -559,7 +582,7 @@ CODE
     -------------------------------------------------------------------------
 CODE
   Relative segment, address: CODE 000004CE - 000004EB (0x1e bytes), align: 1
-  Segment part 62.            Intra module refs:   main
+  Segment part 60.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            int16_sin               000004CE 
@@ -567,148 +590,143 @@ CODE
                RSTACK = 00000000 ( 00000002 )
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 000004EC - 00000595 (0xaa bytes), align: 1
-  Segment part 63.            Intra module refs:   main
+  Relative segment, address: CODE 000004EC - 000004ED (0x2 bytes), align: 1
+  Segment part 61.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           int16_pi_regler         000004EC 
-               RSTACK = 00000000 ( 00000004 )
-    -------------------------------------------------------------------------
-NEAR_I
-  Relative segment, address: DATA 00000359 - 00000368 (0x10 bytes), align: 0
-  Segment part 23.            Intra module refs:   int16_pi_regler
-           ENTRY                   ADDRESS         REF BY
-           =====                   =======         ======
-           u_stell                 00000361 
-           v_ist                   0000035F 
-           v_soll                  0000035D 
-           LOCAL                   ADDRESS         
-           =====                   =======         
-           int16_pi_regler::ki     00000368 
-           int16_pi_regler::kp     00000367 
-           int16_pi_regler::reg_abw
-                                   00000363 
-           int16_pi_regler::reg_abw_old
-                                   00000365 
-           int16_pi_regler::u_stell_l
-                                   00000359 
-    -------------------------------------------------------------------------
-CODE
-  Relative segment, address: CODE 00000596 - 000005A7 (0x12 bytes), align: 1
-  Segment part 64.            Intra module refs:   PrintSignedShortFormated
-                                                   main
-                                                   print_execute_time
-                                                   print_int16_itoa
-           LOCAL                   ADDRESS         
-           =====                   =======         
-           PrintString             00000596 
+           empty_func              000004EC 
                RSTACK = 00000000 ( 00000002 )
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 000005A8 - 0000063B (0x94 bytes), align: 1
-  Segment part 65.            Intra module refs:   print_execute_time
+  Relative segment, address: CODE 000004EE - 00000597 (0xaa bytes), align: 1
+  Segment part 62.            Intra module refs:   main
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           int16_pi_regler         000004EE 
+               RSTACK = 00000000 ( 00000004 )
+    -------------------------------------------------------------------------
+NEAR_I
+  Relative segment, address: DATA 00000313 - 00000322 (0x10 bytes), align: 0
+  Segment part 21.            Intra module refs:   int16_pi_regler
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           u_stell                 0000031B 
+           v_ist                   00000319 
+           v_soll                  00000317 
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           int16_pi_regler::ki     00000322 
+           int16_pi_regler::kp     00000321 
+           int16_pi_regler::reg_abw
+                                   0000031D 
+           int16_pi_regler::reg_abw_old
+                                   0000031F 
+           int16_pi_regler::u_stell_l
+                                   00000313 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: CODE 00000598 - 0000061F (0x88 bytes), align: 1
+  Segment part 63.            Intra module refs:   main
+                                                   print_execute_time
                                                    print_int16
            LOCAL                   ADDRESS         
            =====                   =======         
            PrintSignedShortFormated
-                                   000005A8 
-               calls direct
-               RSTACK = 00000000 ( 00000002 )
-               CSTACK = 00000000 ( 0000000A )
-    -------------------------------------------------------------------------
-CODE
-  Relative segment, address: CODE 0000063C - 00000641 (0x6 bytes), align: 1
-  Segment part 66.            Intra module refs:   main
-           ENTRY                   ADDRESS         REF BY
-           =====                   =======         ======
-           print_int16             0000063C 
-               calls direct
-               RSTACK = 00000000 ( 00000002 )
-    -------------------------------------------------------------------------
-CODE
-  Relative segment, address: CODE 00000642 - 0000064B (0xa bytes), align: 1
-  Segment part 67.            Intra module refs:   main
-           ENTRY                   ADDRESS         REF BY
-           =====                   =======         ======
-           print_int16_itoa        00000642 
-               calls direct
+                                   00000598 
                RSTACK = 00000000 ( 00000002 )
                CSTACK = 00000000 ( 00000007 )
     -------------------------------------------------------------------------
-NEAR_Z
-  Relative segment, address: DATA 00000369 - 00000430 (0xc8 bytes), align: 0
-  Segment part 25.            Intra module refs:   ?Subroutine3
-                                                   testData
-                                                   test_loop1
+CODE
+  Relative segment, address: CODE 00000620 - 00000625 (0x6 bytes), align: 1
+  Segment part 64.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           buffer                  00000369 
+           print_int16             00000620 
+               calls direct
+               RSTACK = 00000000 ( 00000002 )
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 0000064C - 00000675 (0x2a bytes), align: 1
+  Relative segment, address: CODE 00000626 - 00000627 (0x2 bytes), align: 1
+  Segment part 65.            Intra module refs:   main
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           print_int16_itoa        00000626 
+               RSTACK = 00000000 ( 00000002 )
+    -------------------------------------------------------------------------
+NEAR_Z
+  Relative segment, address: DATA 00000323 - 000003EA (0xc8 bytes), align: 0
+  Segment part 23.            Intra module refs:   ?Subroutine3
+                                                   main
+                                                   testData
+                                                   test_loop1
+                                                   test_loop4
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           buffer                  00000323 
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: CODE 00000628 - 00000651 (0x2a bytes), align: 1
+  Segment part 66.            Intra module refs:   main
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           testData                00000628 
+               RSTACK = 00000000 ( 00000002 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: CODE 00000652 - 00000675 (0x24 bytes), align: 1
+  Segment part 67.            Intra module refs:   main
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           test_loop1              00000652 
+               RSTACK = 00000000 ( 00000002 )
+    -------------------------------------------------------------------------
+CODE
+  Relative segment, address: CODE 00000676, align: 1
   Segment part 68.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           testData                0000064C 
+           test_loop2              00000676 
                RSTACK = 00000000 ( 00000002 )
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000676 - 00000699 (0x24 bytes), align: 1
-  Segment part 69.            Intra module refs:   main
-           ENTRY                   ADDRESS         REF BY
-           =====                   =======         ======
-           test_loop1              00000676 
-               RSTACK = 00000000 ( 00000002 )
+  Relative segment, address: CODE 00000676 - 00000687 (0x12 bytes), align: 1
+  Segment part 69.            Intra module refs:   test_loop2
+                                                   test_loop3
+           LOCAL                   ADDRESS         
+           =====                   =======         
+           ?Subroutine3            00000676 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 0000069A, align: 1
+  Relative segment, address: CODE 00000688 - 00000689 (0x2 bytes), align: 1
   Segment part 70.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           test_loop2              0000069A 
+           test_loop3              00000688 
                RSTACK = 00000000 ( 00000002 )
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 0000069A - 000006AB (0x12 bytes), align: 1
-  Segment part 71.            Intra module refs:   test_loop2
-                                                   test_loop3
-                                                   test_loop4
-           LOCAL                   ADDRESS         
-           =====                   =======         
-           ?Subroutine3            0000069A 
+  Relative segment, address: CODE 0000068A - 000006BF (0x36 bytes), align: 1
+  Segment part 71.            Intra module refs:   main
+           ENTRY                   ADDRESS         REF BY
+           =====                   =======         ======
+           test_loop4              0000068A 
+               RSTACK = 00000000 ( 00000002 )
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 000006AC - 000006AD (0x2 bytes), align: 1
+  Relative segment, address: CODE 000006C0 - 000006E5 (0x26 bytes), align: 1
   Segment part 72.            Intra module refs:   main
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           test_loop3              000006AC 
-               RSTACK = 00000000 ( 00000002 )
-    -------------------------------------------------------------------------
-CODE
-  Relative segment, address: CODE 000006AE - 000006AF (0x2 bytes), align: 1
-  Segment part 73.            Intra module refs:   main
-           ENTRY                   ADDRESS         REF BY
-           =====                   =======         ======
-           test_loop4              000006AE 
-               RSTACK = 00000000 ( 00000002 )
-    -------------------------------------------------------------------------
-CODE
-  Relative segment, address: CODE 000006B0 - 000006F9 (0x4a bytes), align: 1
-  Segment part 74.            Intra module refs:   main
-           ENTRY                   ADDRESS         REF BY
-           =====                   =======         ======
-           print_execute_time      000006B0 
+           print_execute_time      000006C0 
                calls direct and indirect
                RSTACK = 00000000 ( 00000002 )
-               CSTACK = 00000000 ( 00000002 )
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 000006FA - 00000853 (0x15a bytes), align: 1
-  Segment part 75.
+  Relative segment, address: CODE 000006E6 - 0000084F (0x16a bytes), align: 1
+  Segment part 73.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           main                    000006FA        ?cstartup_call_main (?C_STARTUP)
+           main                    000006E6        ?cstartup_call_main (?C_STARTUP)
                calls direct
                RSTACK = 00000000 ( 00000002 )
     -------------------------------------------------------------------------
@@ -741,68 +759,63 @@ ABSOLUTE
            __?EEARH                0000001F 
     -------------------------------------------------------------------------
 NEAR_ID
-  Relative segment, address: CODE 00001154 - 0000116B (0x18 bytes), align: 0
+  Relative segment, address: CODE 00001150 - 00001302 (0x1b3 bytes), align: 0
   Segment part 12.            Intra module refs:   Segment part 11
     -------------------------------------------------------------------------
 INITTAB
-  Relative segment, address: CODE 00001146 - 0000114C (0x7 bytes), align: 0
+  Relative segment, address: CODE 00001142 - 00001148 (0x7 bytes), align: 0
   Segment part 13.            Intra module refs:   Segment part 11
-                                                   Segment part 14
+                                                   Segment part 15
                                                    Segment part 17
                                                    Segment part 19
                                                    Segment part 21
-                                                   Segment part 23
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            ?<Segment init: NEAR_I>
-                                   00001146 
+                                   00001142 
     -------------------------------------------------------------------------
 NEAR_ID
-  Relative segment, address: CODE 0000116C - 0000134C (0x1e1 bytes), align: 0
-  Segment part 15.            Intra module refs:   Segment part 14
+  Relative segment, address: CODE 00001303 - 00001310 (0xe bytes), align: 0
+  Segment part 16.            Intra module refs:   Segment part 15
     -------------------------------------------------------------------------
 NEAR_ID
-  Relative segment, address: CODE 0000134D - 0000135A (0xe bytes), align: 0
+  Relative segment, address: CODE 00001311 - 00001316 (0x6 bytes), align: 0
   Segment part 18.            Intra module refs:   Segment part 17
     -------------------------------------------------------------------------
 NEAR_ID
-  Relative segment, address: CODE 0000135B - 00001360 (0x6 bytes), align: 0
+  Relative segment, address: CODE 00001317 - 00001322 (0xc bytes), align: 0
   Segment part 20.            Intra module refs:   Segment part 19
     -------------------------------------------------------------------------
 NEAR_ID
-  Relative segment, address: CODE 00001361 - 0000136C (0xc bytes), align: 0
+  Relative segment, address: CODE 00001323 - 00001332 (0x10 bytes), align: 0
   Segment part 22.            Intra module refs:   Segment part 21
     -------------------------------------------------------------------------
-NEAR_ID
-  Relative segment, address: CODE 0000136D - 0000137C (0x10 bytes), align: 0
-  Segment part 24.            Intra module refs:   Segment part 23
-    -------------------------------------------------------------------------
 INITTAB
-  Relative segment, address: CODE 0000114D - 00001153 (0x7 bytes), align: 0
-  Segment part 26.            Intra module refs:   buffer
+  Relative segment, address: CODE 00001149 - 0000114F (0x7 bytes), align: 0
+  Segment part 24.            Intra module refs:   buffer
                                                    errno (?errno)
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            ?<Segment init: NEAR_Z>
-                                   0000114D 
+                                   00001149 
 
     *************************************************************************
 
-  FILE NAME : C:\Programme\IAR Systems\Embedded Workbench 5.51\avr\LIB\CLIB\cl3s-ec_mul.r90
+  FILE NAME : C:\Programme\IAR Systems\Embedded Workbench 6.0\avr\LIB\CLIB\cl3s-ec_mul.r90
   LIBRARY MODULE, NAME : ?__exit
 
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000854 - 00000859 (0x6 bytes), align: 1
+  Relative segment, address: CODE 00000850 - 00000855 (0x6 bytes), align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           __exit                  00000856 
-           ?C_EXIT                 00000856 
-           ?C_FUNCALL              00000854 
-           _exit                   00000854        ?cstartup_call_main (?C_STARTUP)
-           exit                    00000854        ?cstartup_call_main (?C_STARTUP)
+           __exit                  00000852 
+           ?C_EXIT                 00000852 
+           ?C_FUNCALL              00000850 
+           _exit                   00000850        ?cstartup_call_main (?C_STARTUP)
+           exit                    00000850        ?cstartup_call_main (?C_STARTUP)
 
     -------------------------------------------------------------------------
   LIBRARY MODULE, NAME : ?RESET
@@ -823,38 +836,38 @@ INTVEC
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 0000085A, align: 1
+  Relative segment, address: CODE 00000856, align: 1
   Segment part 2.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?C_STARTUP              0000085A        Segment part 0 (?RESET)
-           __RESTART               0000085A 
+           ?C_STARTUP              00000856        Segment part 0 (?RESET)
+           __RESTART               00000856 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 0000085A - 00000865 (0xc bytes), align: 1
+  Relative segment, address: CODE 00000856 - 00000861 (0xc bytes), align: 1
   Segment part 5.             Intra module refs:   Segment part 2
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000866 - 00000869 (0x4 bytes), align: 1
+  Relative segment, address: CODE 00000862 - 00000865 (0x4 bytes), align: 1
   Segment part 7.             Intra module refs:   Segment part 5
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?call_low_level_init    00000866 
+           ?call_low_level_init    00000862 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 0000086A - 00000871 (0x8 bytes), align: 1
+  Relative segment, address: CODE 00000866 - 0000086D (0x8 bytes), align: 1
   Segment part 8.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?need_segment_init      0000086A        ?<Segment init: NEAR_I> (test)
+           ?need_segment_init      00000866        ?<Segment init: NEAR_I> (test)
                                                    ?<Segment init: NEAR_Z> (test)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000872 - 0000087D (0xc bytes), align: 1
+  Relative segment, address: CODE 0000086E - 00000879 (0xc bytes), align: 1
   Segment part 9.             Intra module refs:   ?call_low_level_init
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?cstartup_call_main     00000872 
+           ?cstartup_call_main     0000086E 
 
     -------------------------------------------------------------------------
   LIBRARY MODULE, NAME : ?errno
@@ -862,11 +875,11 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 NEAR_Z
-  Relative segment, address: DATA 00000431 - 00000432 (0x2 bytes), align: 0
+  Relative segment, address: DATA 000003EB - 000003EC (0x2 bytes), align: 0
   Segment part 3.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           errno                   00000431        sqrt (?sqrt)
+           errno                   000003EB        sqrt (?sqrt)
 
     -------------------------------------------------------------------------
   LIBRARY MODULE, NAME : ?frexp
@@ -874,11 +887,11 @@ NEAR_Z
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 0000087E - 000008B9 (0x3c bytes), align: 1
+  Relative segment, address: CODE 0000087A - 000008B5 (0x3c bytes), align: 1
   Segment part 3.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           frexp                   0000087E        sqrt (?sqrt)
+           frexp                   0000087A        sqrt (?sqrt)
                RSTACK = 00000000 ( 00000004 )
 
     -------------------------------------------------------------------------
@@ -887,11 +900,11 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 000008BA - 000008D5 (0x1c bytes), align: 1
+  Relative segment, address: CODE 000008B6 - 000008D1 (0x1c bytes), align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?UC_DIVMOD_L01          000008BA        ?SC_DIVMOD_L01 (?SC_DIVMOD_L01)
+           ?UC_DIVMOD_L01          000008B6        ?SC_DIVMOD_L01 (?SC_DIVMOD_L01)
 
     -------------------------------------------------------------------------
   LIBRARY MODULE, NAME : ?SC_DIVMOD_L01
@@ -899,11 +912,11 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 000008D6 - 000008F5 (0x20 bytes), align: 1
+  Relative segment, address: CODE 000008D2 - 000008F1 (0x20 bytes), align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?SC_DIVMOD_L01          000008D6        Segment part 4 (?sqrt)
+           ?SC_DIVMOD_L01          000008D2        Segment part 4 (?sqrt)
 
     -------------------------------------------------------------------------
   LIBRARY MODULE, NAME : ?S_SHL_L02
@@ -911,11 +924,11 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 000008F6 - 00000901 (0xc bytes), align: 1
+  Relative segment, address: CODE 000008F2 - 000008FD (0xc bytes), align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?S_SHL_L02              000008F6        isqrt_c16 (test)
+           ?S_SHL_L02              000008F2        isqrt_c16 (test)
 
     -------------------------------------------------------------------------
   LIBRARY MODULE, NAME : ?SS_SHR_L02
@@ -923,11 +936,11 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000902 - 0000090D (0xc bytes), align: 1
+  Relative segment, address: CODE 000008FE - 00000909 (0xc bytes), align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?SS_SHR_L02             00000902        int16_pi_regler (test)
+           ?SS_SHR_L02             000008FE        int16_pi_regler (test)
 
     -------------------------------------------------------------------------
   LIBRARY MODULE, NAME : ?US_DIVMOD_L02
@@ -935,11 +948,11 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 0000090E - 00000935 (0x28 bytes), align: 1
+  Relative segment, address: CODE 0000090A - 00000931 (0x28 bytes), align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?US_DIVMOD_L02          0000090E        ?Subroutine4 (test)
+           ?US_DIVMOD_L02          0000090A        ?Subroutine4 (test)
 
     -------------------------------------------------------------------------
   LIBRARY MODULE, NAME : ?L_SHL_L03
@@ -947,11 +960,11 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000936 - 00000945 (0x10 bytes), align: 1
+  Relative segment, address: CODE 00000932 - 00000941 (0x10 bytes), align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?L_SHL_L03              00000936        isqrt (test)
+           ?L_SHL_L03              00000932        isqrt (test)
 
     -------------------------------------------------------------------------
   LIBRARY MODULE, NAME : ?UL_SHR_L03
@@ -959,11 +972,11 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000946 - 00000955 (0x10 bytes), align: 1
+  Relative segment, address: CODE 00000942 - 00000951 (0x10 bytes), align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?UL_SHR_L03             00000946        Segment part 9 (?FLOATS_L04)
+           ?UL_SHR_L03             00000942        Segment part 9 (?FLOATS_L04)
                                                    int32_div16 (test)
 
     -------------------------------------------------------------------------
@@ -972,11 +985,11 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000956 - 00000965 (0x10 bytes), align: 1
+  Relative segment, address: CODE 00000952 - 00000961 (0x10 bytes), align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?SL_SHR_L03             00000956        int16_pi_regler (test)
+           ?SL_SHR_L03             00000952        int16_pi_regler (test)
 
     -------------------------------------------------------------------------
   LIBRARY MODULE, NAME : ?UL_DIVMOD_L03
@@ -984,11 +997,11 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000966 - 000009AB (0x46 bytes), align: 1
+  Relative segment, address: CODE 00000962 - 000009A7 (0x46 bytes), align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?UL_DIVMOD_L03          00000966        ?Subroutine1 (test)
+           ?UL_DIVMOD_L03          00000962        ?Subroutine1 (test)
 
     -------------------------------------------------------------------------
   LIBRARY MODULE, NAME : ?SL_DIVMOD_L03
@@ -996,11 +1009,11 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 000009AC - 000009BB (0x10 bytes), align: 1
+  Relative segment, address: CODE 000009A8 - 000009B7 (0x10 bytes), align: 1
   Segment part 1.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?L_NEG_L03              000009AC        ?SL2F_L04 (?FLOATS_L04)
+           ?L_NEG_L03              000009A8        ?SL2F_L04 (?FLOATS_L04)
                                                    Segment part 9 (?FLOATS_L04)
 
     -------------------------------------------------------------------------
@@ -1009,61 +1022,61 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 000009BC - 000009E5 (0x2a bytes), align: 1
+  Relative segment, address: CODE 000009B8 - 000009E1 (0x2a bytes), align: 1
   Segment part 0.             Intra module refs:   ?F2SL_L04
                                                    ?F_ADD_L04
                                                    ?F_DIV_L04
                                                    ?F_MUL_L04
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 000009E6 - 00000A39 (0x54 bytes), align: 1
+  Relative segment, address: CODE 000009E2 - 00000A35 (0x54 bytes), align: 1
   Segment part 1.             Intra module refs:   ?F_ADD_L04
                                                    ?F_DIV_L04
                                                    ?F_MUL_L04
                                                    Segment part 5
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?F_ROUND_L04            00000A06 
+           ?F_ROUND_L04            00000A02 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000A3A - 00000A3B (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000A36 - 00000A37 (0x2 bytes), align: 1
   Segment part 3.             Intra module refs:   ?F_ROUND_L04
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000A3C - 00000A45 (0xa bytes), align: 1
+  Relative segment, address: CODE 00000A38 - 00000A41 (0xa bytes), align: 1
   Segment part 4.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?SL2F_L04               00000A3C        float_convert_to_float (test)
+           ?SL2F_L04               00000A38        float_convert_to_float (test)
                                                    modf (?modf)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000A46 - 00000A51 (0xc bytes), align: 1
+  Relative segment, address: CODE 00000A42 - 00000A4D (0xc bytes), align: 1
   Segment part 5.             Intra module refs:   ?SL2F_L04
                                                    ?UL2F_L04
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000A52 - 00000A55 (0x4 bytes), align: 1
+  Relative segment, address: CODE 00000A4E - 00000A51 (0x4 bytes), align: 1
   Segment part 6.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?UL2F_L04               00000A52        Segment part 6 (?sinus)
+           ?UL2F_L04               00000A4E        Segment part 6 (?sinus)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000A56 - 00000A67 (0x12 bytes), align: 1
+  Relative segment, address: CODE 00000A52 - 00000A63 (0x12 bytes), align: 1
   Segment part 8.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?F2SL_L04               00000A56        __sinus (?sinus)
+           ?F2SL_L04               00000A52        __sinus (?sinus)
                                                    float_convert_to_int (test)
                                                    modf (?modf)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000A68 - 00000A8B (0x24 bytes), align: 1
+  Relative segment, address: CODE 00000A64 - 00000A87 (0x24 bytes), align: 1
   Segment part 9.             Intra module refs:   ?F2SL_L04
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000A8C - 00000AB9 (0x2e bytes), align: 1
+  Relative segment, address: CODE 00000A88 - 00000AB5 (0x2e bytes), align: 1
   Segment part 10.            Intra module refs:   ?F_ADD_L04
                                                    ?F_CMP_EQ_L04
                                                    ?F_CMP_GE_L04
@@ -1073,10 +1086,10 @@ CODE
                                                    Segment part 11
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?TEST_P_L04             00000A8C 
+           ?TEST_P_L04             00000A88 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000ABA - 00000AD9 (0x20 bytes), align: 1
+  Relative segment, address: CODE 00000AB6 - 00000AD5 (0x20 bytes), align: 1
   Segment part 11.            Intra module refs:   ?F_ADD_L04
                                                    ?F_CMP_EQ_L04
                                                    ?F_CMP_GE_L04
@@ -1087,28 +1100,28 @@ CODE
                                                    Segment part 22
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000ADA - 00000B81 (0xa8 bytes), align: 1
+  Relative segment, address: CODE 00000AD6 - 00000B7D (0xa8 bytes), align: 1
   Segment part 12.            Intra module refs:   ?F_SUB_L04
                                                    Segment part 17
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?F_ADD_L04              00000AFA        Segment part 10 (?sinus)
+           ?F_ADD_L04              00000AF6        Segment part 10 (?sinus)
                                                    Segment part 6 (?sqrt)
                                                    float_add (test)
                                                    float_add_const (test)
                                                    sqrt (?sqrt)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000B82 - 00000B87 (0x6 bytes), align: 1
+  Relative segment, address: CODE 00000B7E - 00000B83 (0x6 bytes), align: 1
   Segment part 13.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?F_SUB_L04              00000B82        Segment part 4 (?sinus)
+           ?F_SUB_L04              00000B7E        Segment part 4 (?sinus)
                                                    __sinus (?sinus)
                                                    modf (?modf)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000B88 - 00000B93 (0xc bytes), align: 1
+  Relative segment, address: CODE 00000B84 - 00000B8F (0xc bytes), align: 1
   Segment part 14.            Intra module refs:   ?F2SL_L04
                                                    ?F_DIV_L04
                                                    ?F_INFINITE_L04
@@ -1117,78 +1130,78 @@ CODE
                                                    Segment part 9
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?F_ZERO_L04             00000B88 
+           ?F_ZERO_L04             00000B84 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000B94 - 00000B9B (0x8 bytes), align: 1
+  Relative segment, address: CODE 00000B90 - 00000B97 (0x8 bytes), align: 1
   Segment part 15.            Intra module refs:   ?F_DIV_L04
                                                    ?F_MUL_L04
                                                    Segment part 3
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?F_INFINITE_L04         00000B94 
+           ?F_INFINITE_L04         00000B90 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000B9C - 00000BA1 (0x6 bytes), align: 1
+  Relative segment, address: CODE 00000B98 - 00000B9D (0x6 bytes), align: 1
   Segment part 16.            Intra module refs:   ?F_ADD_L04
                                                    ?F_DIV_L04
                                                    ?F_MUL_L04
                                                    Segment part 17
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?F_NAN_L04              00000B9C 
+           ?F_NAN_L04              00000B98 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000BA2 - 00000BBB (0x1a bytes), align: 1
+  Relative segment, address: CODE 00000B9E - 00000BB7 (0x1a bytes), align: 1
   Segment part 17.            Intra module refs:   ?F_DIV_L04
                                                    ?F_MUL_L04
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000BBC - 00000C91 (0xd6 bytes), align: 1
+  Relative segment, address: CODE 00000BB8 - 00000C8D (0xd6 bytes), align: 1
   Segment part 18.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?F_MUL_L04              00000BBC        Segment part 5 (?sqrt)
+           ?F_MUL_L04              00000BB8        Segment part 5 (?sqrt)
                                                    Segment part 8 (?sinus)
                                                    float_mul (test)
                                                    float_mul_const (test)
                                                    sqrt (?sqrt)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000C92 - 00000DA1 (0x110 bytes), align: 1
+  Relative segment, address: CODE 00000C8E - 00000D9D (0x110 bytes), align: 1
   Segment part 19.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?F_DIV_L04              00000CAE        ?Subroutine0 (test)
+           ?F_DIV_L04              00000CAA        ?Subroutine0 (test)
                                                    Segment part 6 (?sqrt)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000DA2 - 00000DBF (0x1e bytes), align: 1
+  Relative segment, address: CODE 00000D9E - 00000DBB (0x1e bytes), align: 1
   Segment part 20.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?F_CMP_EQ_L04           00000DAC        frexp (?frexp)
+           ?F_CMP_EQ_L04           00000DA8        frexp (?frexp)
                                                    sqrt (?sqrt)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000DC0 - 00000DC7 (0x8 bytes), align: 1
+  Relative segment, address: CODE 00000DBC - 00000DC3 (0x8 bytes), align: 1
   Segment part 21.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?F_CMP_LT_L04           00000DC0        __sinus (?sinus)
+           ?F_CMP_LT_L04           00000DBC        __sinus (?sinus)
                                                    sqrt (?sqrt)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000DC8 - 00000DEF (0x28 bytes), align: 1
+  Relative segment, address: CODE 00000DC4 - 00000DEB (0x28 bytes), align: 1
   Segment part 22.            Intra module refs:   ?F_CMP_GE_L04
                                                    ?F_CMP_LT_L04
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000DF0 - 00000DFF (0x10 bytes), align: 1
+  Relative segment, address: CODE 00000DEC - 00000DFB (0x10 bytes), align: 1
   Segment part 23.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?F_CMP_GE_L04           00000DF0        __sinus (?sinus)
+           ?F_CMP_GE_L04           00000DEC        __sinus (?sinus)
                                                    modf (?modf)
 
     -------------------------------------------------------------------------
@@ -1197,91 +1210,91 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000E00 - 00000E01 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000DFC - 00000DFD (0x2 bytes), align: 1
   Segment part 4.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?PROLOGUE12_L09         00000E00        sqrt (?sqrt)
+           ?PROLOGUE12_L09         00000DFC        sqrt (?sqrt)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E02 - 00000E03 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000DFE - 00000DFF (0x2 bytes), align: 1
   Segment part 5.             Intra module refs:   ?PROLOGUE12_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?PROLOGUE11_L09         00000E02 
+           ?PROLOGUE11_L09         00000DFE 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E04 - 00000E05 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E00 - 00000E01 (0x2 bytes), align: 1
   Segment part 6.             Intra module refs:   ?PROLOGUE11_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?PROLOGUE10_L09         00000E04 
+           ?PROLOGUE10_L09         00000E00 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E06 - 00000E07 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E02 - 00000E03 (0x2 bytes), align: 1
   Segment part 7.             Intra module refs:   ?PROLOGUE10_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?PROLOGUE9_L09          00000E06 
+           ?PROLOGUE9_L09          00000E02 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E08 - 00000E09 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E04 - 00000E05 (0x2 bytes), align: 1
   Segment part 8.             Intra module refs:   ?PROLOGUE9_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?PROLOGUE8_L09          00000E08        __sinus (?sinus)
+           ?PROLOGUE8_L09          00000E04        __sinus (?sinus)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E0A - 00000E0B (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E06 - 00000E07 (0x2 bytes), align: 1
   Segment part 9.             Intra module refs:   ?PROLOGUE8_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?PROLOGUE7_L09          00000E0A 
+           ?PROLOGUE7_L09          00000E06 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E0C - 00000E0D (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E08 - 00000E09 (0x2 bytes), align: 1
   Segment part 10.            Intra module refs:   ?PROLOGUE7_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?PROLOGUE6_L09          00000E0C 
+           ?PROLOGUE6_L09          00000E08 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E0E - 00000E0F (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E0A - 00000E0B (0x2 bytes), align: 1
   Segment part 11.            Intra module refs:   ?PROLOGUE6_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?PROLOGUE5_L09          00000E0E 
+           ?PROLOGUE5_L09          00000E0A 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E10 - 00000E11 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E0C - 00000E0D (0x2 bytes), align: 1
   Segment part 12.            Intra module refs:   ?PROLOGUE5_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?PROLOGUE4_L09          00000E10        modf (?modf)
+           ?PROLOGUE4_L09          00000E0C        modf (?modf)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E12 - 00000E13 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E0E - 00000E0F (0x2 bytes), align: 1
   Segment part 13.            Intra module refs:   ?PROLOGUE4_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?PROLOGUE3_L09          00000E12 
+           ?PROLOGUE3_L09          00000E0E 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E14 - 00000E15 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E10 - 00000E11 (0x2 bytes), align: 1
   Segment part 14.            Intra module refs:   ?PROLOGUE3_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?PROLOGUE2_L09          00000E14 
+           ?PROLOGUE2_L09          00000E10 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E16 - 00000E17 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E12 - 00000E13 (0x2 bytes), align: 1
   Segment part 15.            Intra module refs:   ?PROLOGUE2_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?PROLOGUE1_L09          00000E16 
+           ?PROLOGUE1_L09          00000E12 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E18 - 00000E19 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E14 - 00000E15 (0x2 bytes), align: 1
   Segment part 16.            Intra module refs:   ?PROLOGUE1_L09
 
     -------------------------------------------------------------------------
@@ -1290,95 +1303,95 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000E1A - 00000E1B (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E16 - 00000E17 (0x2 bytes), align: 1
   Segment part 4.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?EPILOGUE_B12_L09       00000E1A        sqrt (?sqrt)
+           ?EPILOGUE_B12_L09       00000E16        sqrt (?sqrt)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E1C - 00000E1D (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E18 - 00000E19 (0x2 bytes), align: 1
   Segment part 5.             Intra module refs:   ?EPILOGUE_B12_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?EPILOGUE_B11_L09       00000E1C 
+           ?EPILOGUE_B11_L09       00000E18 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E1E - 00000E1F (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E1A - 00000E1B (0x2 bytes), align: 1
   Segment part 6.             Intra module refs:   ?EPILOGUE_B11_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?EPILOGUE_B10_L09       00000E1E 
+           ?EPILOGUE_B10_L09       00000E1A 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E20 - 00000E21 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E1C - 00000E1D (0x2 bytes), align: 1
   Segment part 7.             Intra module refs:   ?EPILOGUE_B10_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?EPILOGUE_B9_L09        00000E20 
+           ?EPILOGUE_B9_L09        00000E1C 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E22 - 00000E23 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E1E - 00000E1F (0x2 bytes), align: 1
   Segment part 8.             Intra module refs:   ?EPILOGUE_B9_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?EPILOGUE_B8_L09        00000E22        __sinus (?sinus)
+           ?EPILOGUE_B8_L09        00000E1E        __sinus (?sinus)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E24 - 00000E25 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E20 - 00000E21 (0x2 bytes), align: 1
   Segment part 9.             Intra module refs:   ?EPILOGUE_B8_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?EPILOGUE_B7_L09        00000E24 
+           ?EPILOGUE_B7_L09        00000E20 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E26 - 00000E27 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E22 - 00000E23 (0x2 bytes), align: 1
   Segment part 10.            Intra module refs:   ?EPILOGUE_B7_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?EPILOGUE_B6_L09        00000E26 
+           ?EPILOGUE_B6_L09        00000E22 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E28 - 00000E29 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E24 - 00000E25 (0x2 bytes), align: 1
   Segment part 11.            Intra module refs:   ?EPILOGUE_B6_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?EPILOGUE_B5_L09        00000E28 
+           ?EPILOGUE_B5_L09        00000E24 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E2A - 00000E2B (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E26 - 00000E27 (0x2 bytes), align: 1
   Segment part 12.            Intra module refs:   ?EPILOGUE_B5_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?EPILOGUE_B4_L09        00000E2A        modf (?modf)
+           ?EPILOGUE_B4_L09        00000E26        modf (?modf)
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E2C - 00000E2D (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E28 - 00000E29 (0x2 bytes), align: 1
   Segment part 13.            Intra module refs:   ?EPILOGUE_B4_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?EPILOGUE_B3_L09        00000E2C 
+           ?EPILOGUE_B3_L09        00000E28 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E2E - 00000E2F (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E2A - 00000E2B (0x2 bytes), align: 1
   Segment part 14.            Intra module refs:   ?EPILOGUE_B3_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?EPILOGUE_B2_L09        00000E2E 
+           ?EPILOGUE_B2_L09        00000E2A 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E30 - 00000E31 (0x2 bytes), align: 1
+  Relative segment, address: CODE 00000E2C - 00000E2D (0x2 bytes), align: 1
   Segment part 15.            Intra module refs:   ?EPILOGUE_B2_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?EPILOGUE_B1_L09        00000E30 
+           ?EPILOGUE_B1_L09        00000E2C 
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E32 - 00000E3B (0xa bytes), align: 1
+  Relative segment, address: CODE 00000E2E - 00000E37 (0xa bytes), align: 1
   Segment part 16.            Intra module refs:   ?EPILOGUE_B1_L09
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           ?EPILOGUE_B0_L09        00000E32 
+           ?EPILOGUE_B0_L09        00000E2E 
 
     -------------------------------------------------------------------------
   LIBRARY MODULE, NAME : ?REGISTER_CGREGR4_L10
@@ -1386,12 +1399,12 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000E3C, align: 1
+  Relative segment, address: CODE 00000E38, align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            ?Register_R4_is_cg_reg
-                                   00000E3C        Sine (test)
+                                   00000E38        Sine (test)
                                                    __sinus (?sinus)
                                                    isqrt (test)
                                                    sqrt (?sqrt)
@@ -1402,12 +1415,12 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000E3C, align: 1
+  Relative segment, address: CODE 00000E38, align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            ?Register_R5_is_cg_reg
-                                   00000E3C        Sine (test)
+                                   00000E38        Sine (test)
                                                    __sinus (?sinus)
                                                    isqrt (test)
                                                    sqrt (?sqrt)
@@ -1418,12 +1431,12 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000E3C, align: 1
+  Relative segment, address: CODE 00000E38, align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            ?Register_R6_is_cg_reg
-                                   00000E3C        Sine (test)
+                                   00000E38        Sine (test)
                                                    __sinus (?sinus)
                                                    isqrt (test)
                                                    sqrt (?sqrt)
@@ -1434,12 +1447,12 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000E3C, align: 1
+  Relative segment, address: CODE 00000E38, align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            ?Register_R7_is_cg_reg
-                                   00000E3C        __sinus (?sinus)
+                                   00000E38        __sinus (?sinus)
                                                    isqrt (test)
                                                    sqrt (?sqrt)
 
@@ -1449,12 +1462,12 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000E3C, align: 1
+  Relative segment, address: CODE 00000E38, align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            ?Register_R8_is_cg_reg
-                                   00000E3C        isqrt (test)
+                                   00000E38        isqrt (test)
                                                    sqrt (?sqrt)
 
     -------------------------------------------------------------------------
@@ -1463,12 +1476,12 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000E3C, align: 1
+  Relative segment, address: CODE 00000E38, align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            ?Register_R9_is_cg_reg
-                                   00000E3C        isqrt (test)
+                                   00000E38        isqrt (test)
                                                    sqrt (?sqrt)
 
     -------------------------------------------------------------------------
@@ -1477,12 +1490,12 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000E3C, align: 1
+  Relative segment, address: CODE 00000E38, align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            ?Register_R10_is_cg_reg
-                                   00000E3C        isqrt (test)
+                                   00000E38        isqrt (test)
                                                    sqrt (?sqrt)
 
     -------------------------------------------------------------------------
@@ -1491,12 +1504,12 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000E3C, align: 1
+  Relative segment, address: CODE 00000E38, align: 1
   Segment part 0.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
            ?Register_R11_is_cg_reg
-                                   00000E3C        isqrt (test)
+                                   00000E38        isqrt (test)
                                                    sqrt (?sqrt)
 
     -------------------------------------------------------------------------
@@ -1505,11 +1518,11 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000E3C - 00000E3F (0x4 bytes), align: 1
+  Relative segment, address: CODE 00000E38 - 00000E3B (0x4 bytes), align: 1
   Segment part 3.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           __low_level_init        00000E3C        ?call_low_level_init (?C_STARTUP)
+           __low_level_init        00000E38        ?call_low_level_init (?C_STARTUP)
                RSTACK = 00000000 ( 00000002 )
 
     -------------------------------------------------------------------------
@@ -1518,16 +1531,16 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000E40 - 00000E87 (0x48 bytes), align: 1
+  Relative segment, address: CODE 00000E3C - 00000E83 (0x48 bytes), align: 1
   Segment part 3.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           modf                    00000E40        __sinus (?sinus)
+           modf                    00000E3C        __sinus (?sinus)
                RSTACK = 00000000 ( 00000004 )
                CSTACK = 00000000 ( 00000004 )
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E88 - 00000E91 (0xa bytes), align: 1
+  Relative segment, address: CODE 00000E84 - 00000E8D (0xa bytes), align: 1
   Segment part 4.             Intra module refs:   modf
 
     -------------------------------------------------------------------------
@@ -1536,32 +1549,32 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000E92 - 00000E99 (0x8 bytes), align: 1
+  Relative segment, address: CODE 00000E8E - 00000E95 (0x8 bytes), align: 1
   Segment part 3.             Intra module refs:   __segment_init
            LOCAL                   ADDRESS         
            =====                   =======         
-           __memclr                00000E92 
+           __memclr                00000E8E 
                RSTACK = 00000000 ( 00000002 )
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000E9A - 00000EA5 (0xc bytes), align: 1
+  Relative segment, address: CODE 00000E96 - 00000EA1 (0xc bytes), align: 1
   Segment part 4.             Intra module refs:   __segment_init
            LOCAL                   ADDRESS         
            =====                   =======         
-           __flashcpy              00000E9A 
+           __flashcpy              00000E96 
                RSTACK = 00000000 ( 00000002 )
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000EA6 - 00000EB1 (0xc bytes), align: 1
+  Relative segment, address: CODE 00000EA2 - 00000EAD (0xc bytes), align: 1
   Segment part 5.             Intra module refs:   __flashcpy
                                                    __memclr
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00000EB2 - 00000F11 (0x60 bytes), align: 1
+  Relative segment, address: CODE 00000EAE - 00000F0D (0x60 bytes), align: 1
   Segment part 6.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           __segment_init          00000EB2        ?need_segment_init (?C_STARTUP)
+           __segment_init          00000EAE        ?need_segment_init (?C_STARTUP)
                calls direct
                RSTACK = 00000000 ( 00000002 )
 
@@ -1571,11 +1584,11 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000F12 - 00000F17 (0x6 bytes), align: 1
+  Relative segment, address: CODE 00000F0E - 00000F13 (0x6 bytes), align: 1
   Segment part 3.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           sin                     00000F12        float_sin (test)
+           sin                     00000F0E        float_sin (test)
                calls direct
                RSTACK = 00000000 ( 00000002 )
 
@@ -1585,44 +1598,44 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 00000F18 - 00001035 (0x11e bytes), align: 1
+  Relative segment, address: CODE 00000F14 - 00001031 (0x11e bytes), align: 1
   Segment part 3.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           __sinus                 00000F18        sin (?sin)
+           __sinus                 00000F14        sin (?sin)
                calls direct
                RSTACK = 00000000 ( 00000004 )
                CSTACK = 00000000 ( 00000010 )
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00001036 - 00001039 (0x4 bytes), align: 1
+  Relative segment, address: CODE 00001032 - 00001035 (0x4 bytes), align: 1
   Segment part 4.             Intra module refs:   __sinus
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 0000103A - 0000103F (0x6 bytes), align: 1
+  Relative segment, address: CODE 00001036 - 0000103B (0x6 bytes), align: 1
   Segment part 5.             Intra module refs:   Segment part 4
                                                    __sinus
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00001040 - 00001047 (0x8 bytes), align: 1
+  Relative segment, address: CODE 0000103C - 00001043 (0x8 bytes), align: 1
   Segment part 6.             Intra module refs:   __sinus
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00001048 - 0000104B (0x4 bytes), align: 1
+  Relative segment, address: CODE 00001044 - 00001047 (0x4 bytes), align: 1
   Segment part 7.             Intra module refs:   __sinus
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 0000104C - 0000104F (0x4 bytes), align: 1
+  Relative segment, address: CODE 00001048 - 0000104B (0x4 bytes), align: 1
   Segment part 8.             Intra module refs:   Segment part 7
                                                    Segment part 9
                                                    __sinus
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00001050 - 00001057 (0x8 bytes), align: 1
+  Relative segment, address: CODE 0000104C - 00001053 (0x8 bytes), align: 1
   Segment part 9.             Intra module refs:   __sinus
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00001058 - 0000105B (0x4 bytes), align: 1
+  Relative segment, address: CODE 00001054 - 00001057 (0x4 bytes), align: 1
   Segment part 10.            Intra module refs:   Segment part 9
                                                    __sinus
 
@@ -1632,25 +1645,25 @@ CODE
   SEGMENTS IN THE MODULE
   ======================
 CODE
-  Relative segment, address: CODE 0000105C - 00001129 (0xce bytes), align: 1
+  Relative segment, address: CODE 00001058 - 00001125 (0xce bytes), align: 1
   Segment part 3.
            ENTRY                   ADDRESS         REF BY
            =====                   =======         ======
-           sqrt                    0000105C        float_sqrt (test)
+           sqrt                    00001058        float_sqrt (test)
                calls direct
                RSTACK = 00000000 ( 00000004 )
                CSTACK = 00000000 ( 0000000E )
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 0000112A - 0000112F (0x6 bytes), align: 1
+  Relative segment, address: CODE 00001126 - 0000112B (0x6 bytes), align: 1
   Segment part 4.             Intra module refs:   sqrt
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 00001130 - 00001139 (0xa bytes), align: 1
+  Relative segment, address: CODE 0000112C - 00001135 (0xa bytes), align: 1
   Segment part 5.             Intra module refs:   sqrt
     -------------------------------------------------------------------------
 CODE
-  Relative segment, address: CODE 0000113A - 00001145 (0xc bytes), align: 1
+  Relative segment, address: CODE 00001136 - 00001141 (0xc bytes), align: 1
   Segment part 6.             Intra module refs:   sqrt
 
     *************************************************************************
@@ -1683,9 +1696,9 @@ SEGMENT              SPACE    START ADDRESS   END ADDRESS     SIZE  TYPE  ALIGN
 INTVEC               CODE          00000000 - 00000003           4   com    1
 ?FILL1               CODE          00000004 - 0000008B          88   rel    0
 NEAR_F               CODE          0000008C - 0000010F          84   rel    0
-CODE                 CODE          00000110 - 00001145        1036   rel    1
-INITTAB              CODE          00001146 - 00001153           E   rel    0
-NEAR_ID              CODE          00001154 - 0000137C         229   rel    0
+CODE                 CODE          00000110 - 00001141        1032   rel    1
+INITTAB              CODE          00001142 - 0000114F           E   rel    0
+NEAR_ID              CODE          00001150 - 00001332         1E3   rel    0
 ABSOLUTE             DATA               0000001C                     rel    0
                      DATA               0000001D                   
                      DATA               0000001E                   
@@ -1694,8 +1707,8 @@ ABSOLUTE             DATA               0000001C                     rel    0
                      DATA          00000056 - 00000056           1 
 CSTACK               DATA          00000100 - 0000011F          20   dse    0
 RSTACK               DATA          00000120 - 0000013F          20   dse    0
-NEAR_I               DATA          00000140 - 00000368         229   rel    0
-NEAR_Z               DATA          00000369 - 00000432          CA   rel    0
+NEAR_I               DATA          00000140 - 00000322         1E3   rel    0
+NEAR_Z               DATA          00000323 - 000003EC          CA   rel    0
 
                 ****************************************
                 *                                      *
@@ -1703,8 +1716,8 @@ NEAR_Z               DATA          00000369 - 00000432          CA   rel    0
                 *                                      *
                 ****************************************
 
- 4 853 bytes of CODE memory (+            136 range fill )
-   819 bytes of DATA memory (+ 5 absolute )
+ 4 779 bytes of CODE memory (+            136 range fill )
+   749 bytes of DATA memory (+ 5 absolute )
 
 Errors: none
 Warnings: none

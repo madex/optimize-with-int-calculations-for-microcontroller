@@ -1,7 +1,7 @@
 OUT      ?= test
 OBJ       = $(OUT).o asmlib.o
 
-OPTIMIZE  = -O2
+OPTIMIZE  = -Os
 WARNINGS  =
 LIBS      = 
 SIM_OBJ   = $(patsubst %.o,%_sim.o,$(OBJ))
@@ -15,8 +15,10 @@ SIM_LDFLAGS = -Wl,-Map,$(OUT)_sim.map
 
 PC_OBJ    = 
 
-MCU_CC    = avr-gcc
-OBJDUMP   = avr-objdump
+#MCU_CC    = C:/avr-gcc-4.6.1/gcc-4.6.1-mingw32/bin/avr-gcc
+#OBJDUMP   = C:/avr-gcc-4.6.1/gcc-4.6.1-mingw32/bin/avr-objdump
+MCU_CC     = avr-gcc
+OBJDUMP    = avr-objdump
 
 simul: $(OUT)_sim.elf $(OUT)_sim.lst 
 	simulavr -d $(SIM_DEV) -W $(SIM_WIO),- -f $(OUT)_sim.elf -T exit

@@ -11,6 +11,17 @@ typedef   signed long   int32_t;
 #define PW(a) (a)
 #include <math.h>
 
+#elif defined  CODE_VISION
+
+#include <io.h> 
+#include <math.h>
+#include <stdint.h>
+#include <stdio.h>
+#define PW(a) (a)
+#include <math.h>
+#define const flash
+#define PROGMEM 
+
 #else
 
 #include <avr/io.h>
@@ -21,7 +32,7 @@ typedef   signed long   int32_t;
 
 #endif
 
-int16_t PROGMEM sin_table[66] = {
+const int16_t PROGMEM sin_table[66] = {
 
       0,   804,  1608,  2410,  3212,  4011,  4808,  5602,
    6393,  7179,  7962,  8739,  9512, 10278, 11039, 11793,
@@ -64,7 +75,7 @@ static int16_t Cosi(int32_t phase)
 }
 
 /* by Jim Ulery  http://www.azillionmonkeys.com/qed/ulerysqroot.pdf  */
-static uint32_t isqrt(uint32_t val) {
+static uint32_t isqrt_c32(uint32_t val) {
     uint32_t temp, g = 0, b = 0x8000, bshft = 15;
     do {
         if (val >= (temp = (((g << 1) + b)<<bshft--))) {
@@ -186,19 +197,23 @@ void int32_mult() {
 }
 
 void int32_sqrt() {
-	l_c = isqrt(23442342);
+	l_c = isqrt_c32(23442342);
 }
 
 void int32_sqrt_asm() {
-#ifndef  __IAR_SYSTEMS_ICC__     
+#ifndef  __IAR_SYSTEMS_ICC__ 
+#ifndef  CODE_VISION    
 	l_c = isqrt32(23442342);
+#endif
 #endif
 }
 
 void int16_sqrt_asm() {
-#ifndef  __IAR_SYSTEMS_ICC__       
+#ifndef  __IAR_SYSTEMS_ICC__
+#ifndef  CODE_VISION       
 	i_c = isqrt16(23442);
-#endif        
+#endif    
+#endif    
 }
 
 void int16_sqrt() {
@@ -243,10 +258,14 @@ void int16_pi_regler() {
 #define special_input_port  (*((volatile char *) SIM_RIO))
 #endif
 
-static PrintString(const char* str) {
+static void PrintString(char* str) {
 	const char *c;
+#ifndef  __IAR_SYSTEMS_ICC__
+#ifndef  CODE_VISION
 	for(c = str; *c; c++)
 	  special_output_port = *c;
+#endif
+#endif
 }
 
 static void PrintSignedShortFormated(signed short value) {
@@ -276,7 +295,7 @@ static void PrintSignedShortFormated(signed short value) {
     *--sBuf = minus;                  // Minuszeichen vor die höchstwertigste Stelle setzen
     while (sBuf > sBuf0)              // mit Leerzeichen auffüllen (für Formatierung)  
       *--sBuf = ' ';
-    PrintString((const char*) sBuf0); // String ausgeben
+    PrintString(sBuf0); // String ausgeben
 }
 
 
@@ -286,10 +305,12 @@ void print_int16(void) {
 
 void print_int16_itoa(void) {
 	unsigned char sbuf[7];
-#ifndef  __IAR_SYSTEMS_ICC__    
+#ifndef  __IAR_SYSTEMS_ICC__
+#ifndef  CODE_VISION  
 	itoa(-32421, sbuf, 10);
 #endif
-	PrintString((const char*) sbuf);
+#endif
+	PrintString(sbuf);
 }
 
 uint16_t buffer[10][10];
@@ -329,14 +350,21 @@ void test_loop3() {
 }
 
 void test_loop4() {
-  	uint8_t x = 10*10;
+  	uint8_t x = 10;
   	uint16_t *ptr = (uint16_t *) buffer; 
    	do {
    		*ptr++ = 0;
+   		*ptr++ = 0;
+   		*ptr++ = 0; 
+   		*ptr++ = 0; 
+   		*ptr++ = 0; 
+   		*ptr++ = 0; 
+   		*ptr++ = 0; 
+   		*ptr++ = 0; 
+   		*ptr++ = 0; 
+   		*ptr++ = 0; 		
    	} while (--x);
 }
-
-
 
 /*
 static void PrintSignedShort(signed short value) {
@@ -366,7 +394,7 @@ static void PrintSignedShort(signed short value) {
 */
 
 // typedef void (*test_func_t)(void);
-#define TIME_FUNC(func) print_execute_time(func, "" # func) 
+#define TIME_FUNC(func) print_execute_time(func, (unsigned char*) "" # func) 
 
 unsigned short print_execute_time(test_func_t function, char name[]) {
 	// Timer anhalten und initialisieren
@@ -394,7 +422,7 @@ static void assert_(uint8_t compareTrue, uint16_t line) {
     }
 }
 
-int main() {
+void main() {
 	PrintString("\nZeitmessung Rechenoperationen\n");
 	PrintString("\n Takte   Funktionsname\n");
 	TIME_FUNC(float_convert_to_float);
@@ -452,5 +480,5 @@ int main() {
 	//PrintString("\n - isqrt16(23442) = ");
 	//PrintSignedShortFormated(isqrt_c16(23442));
 	//PrintString("\n");	
-	return 0;	
+	//return 0;	
 }

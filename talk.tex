@@ -179,8 +179,7 @@ signed algemein& f\"ur n Bits& $-(2^{n-1}) \ldots (2^{n-1}-1)$ \\
 \begin{itemize}
  \item Auf das Wesentliche beschränken.\pause 
  \item Störer abschalten, z.B. Interrupts.\pause
- \item Einen Timer zu zeit messen verwenden.\pause
- \item Ich hab da mal was vorbeireitet.
+ \item Einen Timer zum Zeit messen verwenden.
 \end{itemize}
 \end{frame}
 
@@ -203,7 +202,8 @@ void print_execute_time(test_func_t func, char name[]) {
 
 \begin{frame}[fragile]{Beispiel unoptimiert}
 \begin{verbatim}
-for (uint8_t t = 0; t < 100; t++) {
+for (uint8_t t = 0; 
+t < 100; t++) {
   for (uint8_t x = 0; x < 16; x++) {
     for (uint8_t y = 0; y < 16; y++) {
       buffer[x][y] = sqrt(t*t*x*x)*sin(y*y) + 566*t*y/300 
@@ -235,14 +235,16 @@ for (uint8_t t = 0; t < 100; t++) {
 \begin{frame}[fragile]{Optimierung Schritt 2}
 Division ist langsam! \newline
 Es sei denn, es wird durch eine 2er Potenzen geteilt.
-\begin{IEEEeqnarray*}{c}
+%\begin{IEEEeqnarray*}{c}
+\begin{eqnarray*}
 \frac{\overbrace{566}^k \cdot t \cdot y}{300} \ 
 \uncover<2->{= \frac{k \cdot c \cdot t \cdot y}{\underbrace{300 \cdot c}_{2^n}}} 
 \uncover<6->{\alert{\approx \frac{483 \cdot t}{256}}} \\
 \uncover<3->{n = 8 \Rightarrow c = \frac{256}{300}} 
 \uncover<4->{\Rightarrow k \cdot c = \frac{256 \cdot 566}{300} = 482,9866} \\
 \uncover<5->{Fehler = \frac{482,9866 - 483}{482,9866} = 0,00276 \%} 
-\end{IEEEeqnarray*}
+\end{eqnarray*}
+%\end{IEEEeqnarray*}
 \end{frame}
 
 \begin{frame}[fragile]{Optimierung Schritt 3}
@@ -288,8 +290,10 @@ $0,0$		& $0,0$	        & 0        & 0 \\
 $\frac{\pi}{2}$&$1,0$	        & 0x4000   & 0x7FFF \\
 $\frac{3\cdot\pi}{2}$&$-1,0$   & 0xC000   & 0x8001 \\
 \end{tabular}
-Sine(x\_int)   sin(x)
-Umwandlung $ \frac{x \cdot 0x7fff}{\pi} = 10430,06 $ 
+\newline
+Floatingpoint: sin(x) \\
+Integer: Sine(x\_int) \\
+Umwandlung von x nach x\_int $ \frac{x \cdot 0x7fff}{\pi} = 10430,06 $ 
 \end{frame}
 
 \begin{frame}[fragile]{Optimierung Schritt 4}
