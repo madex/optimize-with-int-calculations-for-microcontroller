@@ -185,9 +185,9 @@ signed algemein& f\"ur n Bits& $-(2^{n-1}) \ldots (2^{n-1}-1)$ \\
 
 \begin{frame}[fragile]{Zeit messen von Funktionen}
 \begin{verbatim}
-#define TIME_FUNC(func) print_execute_time(func,""#func) 
+#define TIME_FUNC(func) print_exe_time(func,""#func) 
 typedef void (*test_func_t)(void);
-void print_execute_time(test_func_t func, char name[]) {
+void print_exec_time(test_func_t func, char name[]) {
   TCCR1A = 0; TCCR1B = 0; TCNT1 = 0; TIFR  = 0; 
   TCCR1B = 1; // prescaler 1 Timer starten
   func();
@@ -235,16 +235,16 @@ for (uint8_t t = 0; t < 100; t++) {
 \begin{frame}[fragile]{Optimierung Schritt 2}
 Division ist langsam! \newline
 Es sei denn, es wird durch eine 2er Potenzen geteilt.
-%\begin{IEEEeqnarray*}{c}
-\begin{eqnarray*}
+\begin{IEEEeqnarray*}{c}
+%\begin{eqnarray*}
 \frac{\overbrace{566}^k \cdot t \cdot y}{300} \ 
 \uncover<2->{= \frac{k \cdot c \cdot t \cdot y}{\underbrace{300 \cdot c}_{2^n}}} 
 \uncover<6->{\alert{\approx \frac{483 \cdot t}{256}}} \\
 \uncover<3->{n = 8 \Rightarrow c = \frac{256}{300}} 
 \uncover<4->{\Rightarrow k \cdot c = \frac{256 \cdot 566}{300} = 482,9866} \\
 \uncover<5->{Fehler = \frac{482,9866 - 483}{482,9866} = 0,00276 \%} 
-\end{eqnarray*}
-%\end{IEEEeqnarray*}
+%\end{eqnarray*}
+\end{IEEEeqnarray*}
 \end{frame}
 
 \begin{frame}[fragile]{Optimierung Schritt 3}
@@ -286,9 +286,9 @@ static int16_t Sine(uint16_t phase) {
 \begin{tabular}[c] {cccc}
 float sin in 	& float sin out  & int sin in & int sin out \\
 \hline
-$0,0$		& $0,0$	        & 0        & 0 \\
-$\frac{\pi}{2}$&$1,0$	        & 0x4000   & 0x7FFF \\
-$\frac{3\cdot\pi}{2}$&$-1,0$   & 0xC000   & 0x8001 \\
+$0,0$		& $0,0$	        	& 0        & 0 \\
+$\frac{\pi}{2}$&$1,0$	        	& 0x4000   & 0x7FFF \\
+$\frac{3\cdot\pi}{2}$&$-1,0$  	& 0xC000   & 0x8001 \\
 \end{tabular}
 \newline
 Floatingpoint: sin(x) \\
@@ -313,21 +313,19 @@ for (uint8_t t = 0; t < 100; t++) {
 \end{verbatim}
 \end{frame}
 
+\begin{frame}{Küstliche Nachkommastellen}
 
-\subsection{Zweiter Unterabschnittstitel}
-
-\begin{frame}{Überschriften müssen informativ sein.}
+Durch Multiplikation eines Faktors $f$ zur einer Variablen $x$ kann man sich künstliche 
+Nachkommastellen aus Ganzzahlen machen. Am effizentesten sind dabei 2er Protenz, da Dividieren und
+und Modulo rechenaufwendig sind. \\
+\begin{IEEEeqnarray*}{c}
+\uncover<2->{x_n = x \cdot f }\uncover<3->{\Rightarrow x_n^2 = x \cdot f \cdot x \cdot f} \\
+\uncover<4->{\frac{2 \cdot x_n}{y_n} = \frac{2\cdot x \cdot f}{y \cdot f}}
+\end{IEEEeqnarray*}
+\uncover<5->{Am Besten eien Einheit suchen in der man keine Nachkommastellen brauch.}
 \end{frame}
 
-\begin{frame}{Überschriften müssen informativ sein.}
-\end{frame}
-
-\section*{Zusammenfassung}
-
-\begin{frame}{Zusammenfassung}
-
-\end{frame}
-
+% http://www.atmel.com/dyn/resources/prod_documents/doc1497.pdf
 
 \end{document}
 
