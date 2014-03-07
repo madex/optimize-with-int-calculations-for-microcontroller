@@ -1,0 +1,44 @@
+simulavr -d atmega128 -W 0x30,- -f iar_sim.elf
+
+Zeitmessung Rechenoperationen
+
+ Takte   Funktionsname
+   243 : float_convert_to_float
+   213 : float_convert_to_int
+   257 : float_add_const
+   196 : float_add
+   234 : float_mul_const
+   229 : float_mul
+   772 : float_div_const
+   748 : float_div
+   222 : int16_div10
+    48 : int16_div10_fast
+    30 : int16_div16
+   227 : int16_div
+    27 : int16_mult_const
+    33 : int16_mult
+   597 : int32_div10
+    72 : int32_div16
+   630 : int32_div
+    49 : int32_mult_const
+  2661 : float_sqrt
+   422 : int16_sqrt
+    10 : int16_sqrt_asm
+  1638 : int32_sqrt
+    10 : int32_sqrt_asm
+  3294 : float_sin
+   101 : int16_sin
+   786 : test_loop1
+   713 : test_loop2
+   715 : test_loop3
+   443 : test_loop4
+   205 : int16_pi_regler
+    10 : empty_func
+-32421   299 : print_int16
+   299    57 : print_int16_itoa
+-32421  2964 : print_myitoa
+-32421   463 : print_myitoa2
+SystemClock::Endless stopped
+number of cpu cycles simulated: 1215978
+IRQ STATISTIC
+	FlagSet	flagCleared	HandlerStarted	HandlerFinished	Set->Clear	Set->Started	Set->Finished	Started->Finished

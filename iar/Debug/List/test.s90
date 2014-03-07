@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                            /
-// IAR C/C++ Compiler V6.10.1.50424 for Atmel AVR       27/Oct/2011  13:47:05 /
+// IAR C/C++ Compiler V6.10.1.50424 for Atmel AVR       23/Nov/2011  18:42:36 /
 // Copyright 1996-2011 IAR Systems AB.                                        /
 //                                                                            /
 //    Source file  =  D:\Devel\git\optimize-with-int-calculations-for-microco /
@@ -207,12 +207,12 @@
         FUNCTION int32_sqrt_asm,0601H
         ARGFRAME CSTACK, 0, STACK
         LOCFRAME RSTACK, 2, STACK
-        FUNCTION isqrt,0203H
-        ARGFRAME RSTACK, 0, STACK
-        LOCFRAME CSTACK, 10, STACK
-        LOCFRAME RSTACK, 4, STACK
         FUNCTION isqrt_c16,0203H
         ARGFRAME RSTACK, 0, STACK
+        LOCFRAME RSTACK, 4, STACK
+        FUNCTION isqrt_c32,0203H
+        ARGFRAME RSTACK, 0, STACK
+        LOCFRAME CSTACK, 10, STACK
         LOCFRAME RSTACK, 4, STACK
         PUBLIC l_a
         PUBLIC l_b
@@ -325,6 +325,8 @@
         EXTERN sin
         FUNCTION sin,010202H
         ARGFRAME RSTACK, 0, STACK
+        EXTERN chg_registers
+        FUNCTION chg_registers,0600H
 
 // D:\Devel\git\optimize-with-int-calculations-for-microcontroller\test.c
 //    1 #ifdef  __IAR_SYSTEMS_ICC__
@@ -360,19 +362,30 @@ _A_TIFR:
 //   11 #define PW(a) (a)
 //   12 #include <math.h>
 //   13 
-//   14 #else
+//   14 #elif defined  CODE_VISION
 //   15 
-//   16 #include <avr/io.h>
-//   17 #include <stdlib.h>
-//   18 #include <math.h>
-//   19 #include <avr/pgmspace.h>
-//   20 #define PW(a) pgm_read_word(&(a))
-//   21 
-//   22 #endif
-//   23 
+//   16 #include <io.h> 
+//   17 #include <math.h>
+//   18 #include <stdint.h>
+//   19 #include <stdio.h>
+//   20 #define PW(a) (a)
+//   21 #include <math.h>
+//   22 #define const flash
+//   23 #define PROGMEM 
+//   24 
+//   25 #else
+//   26 
+//   27 #include <avr/io.h>
+//   28 #include <stdlib.h>
+//   29 #include <math.h>
+//   30 #include <avr/pgmspace.h>
+//   31 #define PW(a) pgm_read_word(&(a))
+//   32 
+//   33 #endif
+//   34 
 
         RSEG NEAR_F:CODE:NOROOT(0)
-//   24 const int16_t PROGMEM sin_table[66] = {
+//   35 const int16_t PROGMEM sin_table[66] = {
 sin_table:
         DC16 0, 804, 1608, 2410, 3212, 4011, 4808, 5602, 6393, 7179, 7962, 8739
         DC16 9512, 10278, 11039, 11793, 12539, 13279, 14010, 14732, 15446
@@ -381,25 +394,25 @@ sin_table:
         DC16 26790, 27245, 27683, 28105, 28510, 28898, 29268, 29621, 29956
         DC16 30273, 30571, 30852, 31113, 31356, 31580, 31785, 31971, 32137
         DC16 32285, 32412, 32521, 32609, 32678, 32728, 32757, 32767, 32757
-//   25 
-//   26       0,   804,  1608,  2410,  3212,  4011,  4808,  5602,
-//   27    6393,  7179,  7962,  8739,  9512, 10278, 11039, 11793,
-//   28   12539, 13279, 14010, 14732, 15446, 16151, 16846, 17530,
-//   29   18204, 18868, 19519, 20159, 20787, 21403, 22005, 22594,
-//   30   23170, 23731, 24279, 24811, 25329, 25832, 26319, 26790,
-//   31   27245, 27683, 28105, 28510, 28898, 29268, 29621, 29956,
-//   32   30273, 30571, 30852, 31113, 31356, 31580, 31785, 31971,
-//   33   32137, 32285, 32412, 32521, 32609, 32678, 32728, 32757,
-//   34   32767, 32757
-//   35 };
 //   36 
+//   37       0,   804,  1608,  2410,  3212,  4011,  4808,  5602,
+//   38    6393,  7179,  7962,  8739,  9512, 10278, 11039, 11793,
+//   39   12539, 13279, 14010, 14732, 15446, 16151, 16846, 17530,
+//   40   18204, 18868, 19519, 20159, 20787, 21403, 22005, 22594,
+//   41   23170, 23731, 24279, 24811, 25329, 25832, 26319, 26790,
+//   42   27245, 27683, 28105, 28510, 28898, 29268, 29621, 29956,
+//   43   30273, 30571, 30852, 31113, 31356, 31580, 31785, 31971,
+//   44   32137, 32285, 32412, 32521, 32609, 32678, 32728, 32757,
+//   45   32767, 32757
+//   46 };
+//   47 
 
         RSEG CODE:CODE:NOROOT(1)
-//   37 static int16_t Sine(int32_t phase)
+//   48 static int16_t Sine(int32_t phase)
 Sine:
         CFI Block cfiBlock0 Using cfiCommon0
         CFI Function Sine
-//   38 {
+//   49 {
         ST      -Y, R6
         CFI R6 Frame(CFA_Y, -1)
         CFI CFA_Y Y+1
@@ -416,29 +429,29 @@ Sine:
         REQUIRE ?Register_R4_is_cg_reg
         REQUIRE ?Register_R5_is_cg_reg
         REQUIRE ?Register_R6_is_cg_reg
-//   39         int16_t s0;
-//   40         uint16_t tmp_phase, tmp_phase_hi;
-//   41 
-//   42         tmp_phase = phase & 0x7fff;
+//   50         int16_t s0;
+//   51         uint16_t tmp_phase, tmp_phase_hi;
+//   52 
+//   53         tmp_phase = phase & 0x7fff;
         MOVW    R21:R20, R17:R16
         ANDI    R21, 0x7F
-//   43 
-//   44         if (tmp_phase & 0x4000)
+//   54 
+//   55         if (tmp_phase & 0x4000)
         BST     R21, 6
         BRTC    ??Sine_0
-//   45                 tmp_phase = 0x8000 - tmp_phase;
+//   56                 tmp_phase = 0x8000 - tmp_phase;
         LDI     R22, 0
         LDI     R23, 128
         SUB     R22, R16
         SBC     R23, R21
         MOVW    R21:R20, R23:R22
-//   46 
-//   47         tmp_phase_hi = tmp_phase >> 8; // 0...64
+//   57 
+//   58         tmp_phase_hi = tmp_phase >> 8; // 0...64
 ??Sine_0:
         MOV     R22, R21
         LDI     R23, 0
-//   48 
-//   49         s0 = PW(sin_table[tmp_phase_hi]);
+//   59 
+//   60         s0 = PW(sin_table[tmp_phase_hi]);
         LSL     R22
         ROL     R23
         LDI     R30, LOW(sin_table)
@@ -447,9 +460,9 @@ Sine:
         ADC     R31, R23
         LPM     R22, Z+
         LPM     R23, Z+
-//   50 
-//   51         s0 += ((int16_t)((((int32_t)(PW(sin_table[tmp_phase_hi+1]) - s0))*
-//   52                                     (tmp_phase&0xff))>>8));
+//   61 
+//   62         s0 += ((int16_t)((((int32_t)(PW(sin_table[tmp_phase_hi+1]) - s0))*
+//   63                                     (tmp_phase&0xff))>>8));
         LPM     R4, Z+
         LPM     R5, Z
         SUB     R4, R22
@@ -469,17 +482,17 @@ Sine:
         ADC     R26, R21
         ADD     R22, R25
         ADC     R23, R26
-//   53 
-//   54         if (phase & 0x8000) {
+//   64 
+//   65         if (phase & 0x8000) {
         SBRS    R17, 7
         RJMP    ??Sine_1
-//   55                 s0 = -s0;
+//   66                 s0 = -s0;
         NEG     R23
         NEG     R22
         SBCI    R23, 0
-//   56         }
-//   57 
-//   58         return s0;
+//   67         }
+//   68 
+//   69         return s0;
 ??Sine_1:
         MOVW    R17:R16, R23:R22
         MOVW    R25:R24, R3:R2
@@ -499,20 +512,20 @@ Sine:
         CFI CFA_Y Y+0
         RET
         CFI EndBlock cfiBlock0
-//   59 }
-//   60 
-//   61 static int16_t Cosi(int32_t phase)
-//   62 {
-//   63     return Sine(phase + 0x4000);
-//   64 }
-//   65 
-//   66 /* by Jim Ulery  http://www.azillionmonkeys.com/qed/ulerysqroot.pdf  */
+//   70 }
+//   71 
+//   72 static int16_t Cosi(int32_t phase)
+//   73 {
+//   74     return Sine(phase + 0x4000);
+//   75 }
+//   76 
+//   77 /* by Jim Ulery  http://www.azillionmonkeys.com/qed/ulerysqroot.pdf  */
 
         RSEG CODE:CODE:NOROOT(1)
-//   67 static uint32_t isqrt(uint32_t val) {
-isqrt:
+//   78 static uint32_t isqrt_c32(uint32_t val) {
+isqrt_c32:
         CFI Block cfiBlock1 Using cfiCommon0
-        CFI Function isqrt
+        CFI Function isqrt_c32
         ST      -Y, R11
         CFI R11 Frame(CFA_Y, -1)
         CFI CFA_Y Y+1
@@ -538,7 +551,7 @@ isqrt:
         REQUIRE ?Register_R11_is_cg_reg
         MOVW    R5:R4, R17:R16
         MOVW    R7:R6, R19:R18
-//   68     uint32_t temp, g = 0, b = 0x8000, bshft = 15;
+//   79     uint32_t temp, g = 0, b = 0x8000, bshft = 15;
         CLR     R8
         CLR     R9
         CLR     R10
@@ -548,9 +561,9 @@ isqrt:
         MOV     R1, R16
         CLR     R2
         LDI     R24, 15
-//   69     do {
-//   70         if (val >= (temp = (((g << 1) + b)<<bshft--))) {
-??isqrt_0:
+//   80     do {
+//   81         if (val >= (temp = (((g << 1) + b)<<bshft--))) {
+??isqrt_c32_0:
         MOVW    R17:R16, R9:R8
         MOVW    R19:R18, R11:R10
         LSL     R16
@@ -568,26 +581,26 @@ isqrt:
         CPC     R5, R17
         CPC     R6, R18
         CPC     R7, R19
-        BRCS    ??isqrt_1
-//   71             g += b;
+        BRCS    ??isqrt_c32_1
+//   82             g += b;
         ADD     R8, R0
         ADC     R9, R1
         ADC     R10, R2
         ADC     R11, R2
-//   72             val -= temp;
+//   83             val -= temp;
         SUB     R4, R16
         SBC     R5, R17
         SBC     R6, R18
         SBC     R7, R19
-//   73         }
-//   74     } while (b >>= 1);
-??isqrt_1:
+//   84         }
+//   85     } while (b >>= 1);
+??isqrt_c32_1:
         LSR     R1
         ROR     R0
         MOV     R16, R0
         OR      R16, R1
-        BRNE    ??isqrt_0
-//   75     return g;
+        BRNE    ??isqrt_c32_0
+//   86     return g;
         MOVW    R17:R16, R9:R8
         MOVW    R19:R18, R11:R10
         MOV     R24, R22
@@ -619,26 +632,26 @@ isqrt:
         CFI CFA_Y Y+0
         RET
         CFI EndBlock cfiBlock1
-//   76 }
-//   77 
+//   87 }
+//   88 
 
         RSEG CODE:CODE:NOROOT(1)
-//   78 static uint16_t isqrt_c16(uint16_t val) {
+//   89 static uint16_t isqrt_c16(uint16_t val) {
 isqrt_c16:
         CFI Block cfiBlock2 Using cfiCommon0
         CFI Function isqrt_c16
         MOV     R21, R25
         MOV     R2, R24
         MOVW    R23:R22, R17:R16
-//   79     uint16_t temp, g = 0, b = 0x80, bshft = 7;
+//   90     uint16_t temp, g = 0, b = 0x80, bshft = 7;
         CLR     R0
         CLR     R1
         LDI     R18, 128
         LDI     R19, 0
         LDI     R24, 7
         LDI     R25, 0
-//   80     do {
-//   81         if (val >= (temp = (((g << 1) + b)<<bshft--))) {
+//   91     do {
+//   92         if (val >= (temp = (((g << 1) + b)<<bshft--))) {
 ??isqrt_c16_0:
         MOVW    R17:R16, R1:R0
         LSL     R16
@@ -651,24 +664,24 @@ isqrt_c16:
         CP      R22, R16
         CPC     R23, R17
         BRCS    ??isqrt_c16_1
-//   82             g += b;
+//   93             g += b;
         ADD     R0, R18
         ADC     R1, R19
-//   83             val -= temp;
+//   94             val -= temp;
         SUB     R22, R16
         SBC     R23, R17
-//   84         }
-//   85     } while (b >>= 1);
+//   95         }
+//   96     } while (b >>= 1);
 ??isqrt_c16_1:
         LSR     R18
         BRNE    ??isqrt_c16_0
-//   86     return g;
+//   97     return g;
         MOVW    R17:R16, R1:R0
         MOV     R24, R2
         MOV     R25, R21
         RET
         CFI EndBlock cfiBlock2
-//   87 }
+//   98 }
 
         RSEG NEAR_I:DATA:NOROOT(0)
         REQUIRE `?<Segment init: NEAR_I>`
@@ -739,15 +752,17 @@ isqrt_c16:
         REQUIRE `?<Initializer for <Constant "print_int16">>`
         DS8 17
         REQUIRE `?<Initializer for <Constant "print_int16_itoa"`
-//   88 
-//   89 #include "asmlib.h"
-//   90 
-//   91 typedef void (*test_func_t)(void);
-//   92 
+        DS8 14
+        REQUIRE `?<Initializer for <Constant "chg_registers">>`
+//   99 
+//  100 #include "asmlib.h"
+//  101 
+//  102 typedef void (*test_func_t)(void);
+//  103 
 
         RSEG NEAR_I:DATA:NOROOT(0)
         REQUIRE `?<Segment init: NEAR_I>`
-//   93 float a = 3454.345334, b = 12232.45345, c = 0.0;
+//  104 float a = 3454.345334, b = 12232.45345, c = 0.0;
 a:
         DS8 4
         REQUIRE `?<Initializer for a>`
@@ -757,19 +772,19 @@ b:
 c:
         DS8 4
         REQUIRE `?<Initializer for c>`
-//   94 short d = 23442;
+//  105 short d = 23442;
 d:
         DS8 2
         REQUIRE `?<Initializer for d>`
-//   95 
+//  106 
 
         RSEG CODE:CODE:NOROOT(1)
-//   96 void float_convert_to_float() {
+//  107 void float_convert_to_float() {
 float_convert_to_float:
         CFI Block cfiBlock3 Using cfiCommon0
         CFI Function float_convert_to_float
         MOVW    R21:R20, R27:R26
-//   97 	c = d;
+//  108 	c = d;
         LDI     R26, LOW((a + 12))
         LDI     R27, HIGH((a + 12))
         LD      R16, X+
@@ -784,20 +799,20 @@ float_convert_to_float:
         ST      X+, R17
         ST      X+, R18
         ST      X, R19
-//   98 }
+//  109 }
         MOVW    R27:R26, R21:R20
         RET
         CFI EndBlock cfiBlock3
-//   99 
+//  110 
 
         RSEG CODE:CODE:NOROOT(1)
-//  100 void float_convert_to_int() {
+//  111 void float_convert_to_int() {
 float_convert_to_int:
         CFI Block cfiBlock4 Using cfiCommon0
         CFI Function float_convert_to_int
         MOV     R21, R27
         MOV     R22, R26
-//  101 	d = (short) c;
+//  112 	d = (short) c;
         LDI     R26, LOW((a + 8))
         LDI     R27, HIGH((a + 8))
         LD      R16, X+
@@ -807,15 +822,15 @@ float_convert_to_int:
         CALL    ?F2SL_L04
         ST      X+, R16
         ST      X, R17
-//  102 }
+//  113 }
         MOV     R26, R22
         MOV     R27, R21
         RET
         CFI EndBlock cfiBlock4
-//  103 
+//  114 
 
         RSEG CODE:CODE:NOROOT(1)
-//  104 void float_add_const(void) {
+//  115 void float_add_const(void) {
 float_add_const:
         CFI Block cfiBlock5 Using cfiCommon0
         CFI Function float_add_const
@@ -825,7 +840,7 @@ float_add_const:
         ST      -Y, R26
         CFI R26 Frame(CFA_Y, -2)
         CFI CFA_Y Y+2
-//  105 	c = a + 4.0;
+//  116 	c = a + 4.0;
         LDI     R26, LOW(a)
         LDI     R27, (a) >> 8
         LDI     R20, 0
@@ -840,11 +855,11 @@ float_add_const:
         CALL    ?F_ADD_L04
         RJMP    ??Subroutine6_0
         CFI EndBlock cfiBlock5
-//  106 }
-//  107 
+//  117 }
+//  118 
 
         RSEG CODE:CODE:NOROOT(1)
-//  108 void float_add(void) {
+//  119 void float_add(void) {
 float_add:
         CFI Block cfiBlock6 Using cfiCommon0
         CFI Function float_add
@@ -854,7 +869,7 @@ float_add:
         ST      -Y, R26
         CFI R26 Frame(CFA_Y, -2)
         CFI CFA_Y Y+2
-//  109 	c = a + b;
+//  120 	c = a + b;
         LDI     R26, LOW((a + 4))
         LDI     R27, HIGH((a + 4))
         LD      R16, X+
@@ -870,11 +885,11 @@ float_add:
         CALL    ?F_ADD_L04
         RJMP    ??Subroutine6_0
         CFI EndBlock cfiBlock6
-//  110 }  
-//  111 
+//  121 }  
+//  122 
 
         RSEG CODE:CODE:NOROOT(1)
-//  112 void float_mul_const(void) {
+//  123 void float_mul_const(void) {
 float_mul_const:
         CFI Block cfiBlock7 Using cfiCommon0
         CFI Function float_mul_const
@@ -884,7 +899,7 @@ float_mul_const:
         ST      -Y, R26
         CFI R26 Frame(CFA_Y, -2)
         CFI CFA_Y Y+2
-//  113 	c = a * 4.0;
+//  124 	c = a * 4.0;
         LDI     R26, LOW(a)
         LDI     R27, (a) >> 8
         LDI     R20, 0
@@ -899,7 +914,7 @@ float_mul_const:
         CALL    ?F_MUL_L04
         RJMP    ??Subroutine6_0
         CFI EndBlock cfiBlock7
-//  114 } 
+//  125 } 
 
         RSEG CODE:CODE:NOROOT(1)
 ?Subroutine0:
@@ -937,10 +952,10 @@ float_mul_const:
         CFI R27 SameValue
         RET
         CFI EndBlock cfiBlock9
-//  115 
+//  126 
 
         RSEG CODE:CODE:NOROOT(1)
-//  116 void float_mul(void) {
+//  127 void float_mul(void) {
 float_mul:
         CFI Block cfiBlock10 Using cfiCommon0
         CFI Function float_mul
@@ -950,7 +965,7 @@ float_mul:
         ST      -Y, R26
         CFI R26 Frame(CFA_Y, -2)
         CFI CFA_Y Y+2
-//  117 	c = a * b;
+//  128 	c = a * b;
         LDI     R26, LOW((a + 4))
         LDI     R27, HIGH((a + 4))
         LD      R16, X+
@@ -966,11 +981,11 @@ float_mul:
         CALL    ?F_MUL_L04
         RJMP    ??Subroutine6_0
         CFI EndBlock cfiBlock10
-//  118 } 
-//  119 
+//  129 } 
+//  130 
 
         RSEG CODE:CODE:NOROOT(1)
-//  120 void float_div_const(void) {
+//  131 void float_div_const(void) {
 float_div_const:
         CFI Block cfiBlock11 Using cfiCommon0
         CFI Function float_div_const
@@ -980,7 +995,7 @@ float_div_const:
         ST      -Y, R26
         CFI R26 Frame(CFA_Y, -2)
         CFI CFA_Y Y+2
-//  121 	c = a / 2.4;
+//  132 	c = a / 2.4;
         LDI     R26, LOW(a)
         LDI     R27, (a) >> 8
         LDI     R20, 154
@@ -989,11 +1004,11 @@ float_div_const:
         LDI     R23, 64
         RJMP    ?Subroutine0
         CFI EndBlock cfiBlock11
-//  122 } 
-//  123 
+//  133 } 
+//  134 
 
         RSEG CODE:CODE:NOROOT(1)
-//  124 void float_div(void) {
+//  135 void float_div(void) {
 float_div:
         CFI Block cfiBlock12 Using cfiCommon0
         CFI Function float_div
@@ -1003,7 +1018,7 @@ float_div:
         ST      -Y, R26
         CFI R26 Frame(CFA_Y, -2)
         CFI CFA_Y Y+2
-//  125 	c = a / b;
+//  136 	c = a / b;
         LDI     R26, LOW((a + 4))
         LDI     R27, HIGH((a + 4))
         LD      R20, X+
@@ -1013,11 +1028,11 @@ float_div:
         SBIW    R27:R26, 7
         RJMP    ?Subroutine0
         CFI EndBlock cfiBlock12
-//  126 }
-//  127 
+//  137 }
+//  138 
 
         RSEG CODE:CODE:NOROOT(1)
-//  128 void float_sqrt() {
+//  139 void float_sqrt() {
 float_sqrt:
         CFI Block cfiBlock13 Using cfiCommon0
         CFI Function float_sqrt
@@ -1031,7 +1046,7 @@ float_sqrt:
         ST      -Y, R26
         CFI R26 Frame(CFA_Y, -2)
         CFI CFA_Y Y+2
-//  129 	c = sqrt(a);
+//  140 	c = sqrt(a);
         LDI     R26, LOW(a)
         LDI     R27, (a) >> 8
         LD      R16, X+
@@ -1042,11 +1057,11 @@ float_sqrt:
         CALL    sqrt
         RJMP    ??Subroutine6_0
         CFI EndBlock cfiBlock13
-//  130 }
-//  131 
+//  141 }
+//  142 
 
         RSEG CODE:CODE:NOROOT(1)
-//  132 void float_sin() {
+//  143 void float_sin() {
 float_sin:
         CFI Block cfiBlock14 Using cfiCommon0
         CFI Function float_sin
@@ -1060,7 +1075,7 @@ float_sin:
         ST      -Y, R26
         CFI R26 Frame(CFA_Y, -2)
         CFI CFA_Y Y+2
-//  133 	c = sin(a);	
+//  144 	c = sin(a);	
         LDI     R26, LOW(a)
         LDI     R27, (a) >> 8
         LD      R16, X+
@@ -1071,12 +1086,12 @@ float_sin:
         CALL    sin
         RJMP    ??Subroutine6_0
         CFI EndBlock cfiBlock14
-//  134 }
-//  135 
+//  145 }
+//  146 
 
         RSEG NEAR_I:DATA:NOROOT(0)
         REQUIRE `?<Segment init: NEAR_I>`
-//  136 unsigned short i_a = 2344, i_b = 23, i_c;
+//  147 unsigned short i_a = 2344, i_b = 23, i_c;
 i_a:
         DS8 2
         REQUIRE `?<Initializer for i_a>`
@@ -1086,19 +1101,19 @@ i_b:
 i_c:
         DS8 2
         REQUIRE `?<Initializer for i_c>`
-//  137 
-//  138 static inline unsigned short div10(unsigned short in) { 
-//  139     return (((unsigned long) in * 52429L)) >> 19;
-//  140 }
-//  141 
+//  148 
+//  149 static inline unsigned short div10(unsigned short in) { 
+//  150     return (((unsigned long) in * 52429L)) >> 19;
+//  151 }
+//  152 
 
         RSEG CODE:CODE:NOROOT(1)
-//  142 void int16_div10() {
+//  153 void int16_div10() {
 int16_div10:
         CFI Block cfiBlock15 Using cfiCommon0
         CFI Function int16_div10
         MOVW    R19:R18, R27:R26
-//  143 	i_c = i_a / 10;
+//  154 	i_c = i_a / 10;
         LDI     R26, LOW(i_a)
         LDI     R27, (i_a) >> 8
         LDI     R20, 10
@@ -1106,7 +1121,7 @@ int16_div10:
         CFI EndBlock cfiBlock15
         REQUIRE ?Subroutine4
         ;               // Fall through to label ?Subroutine4
-//  144 }
+//  155 }
 
         RSEG CODE:CODE:NOROOT(1)
 ?Subroutine4:
@@ -1121,14 +1136,14 @@ int16_div10:
         MOVW    R27:R26, R19:R18
         RET
         CFI EndBlock cfiBlock16
-//  145 
+//  156 
 
         RSEG CODE:CODE:NOROOT(1)
-//  146 void int16_div10_fast() {
+//  157 void int16_div10_fast() {
 int16_div10_fast:
         CFI Block cfiBlock17 Using cfiCommon0
         CFI Function int16_div10_fast
-//  147 	i_c = div10(i_a);
+//  158 	i_c = div10(i_a);
         LDI     R30, LOW(i_a)
         LDI     R31, (i_a) >> 8
         LD      R20, Z
@@ -1154,7 +1169,7 @@ int16_div10_fast:
         CFI EndBlock cfiBlock17
         REQUIRE ?Subroutine2
         ;               // Fall through to label ?Subroutine2
-//  148 }
+//  159 }
 
         RSEG CODE:CODE:NOROOT(1)
 ?Subroutine2:
@@ -1170,14 +1185,14 @@ int16_div10_fast:
         STD     Z+5, R17
         RET
         CFI EndBlock cfiBlock18
-//  149 
+//  160 
 
         RSEG CODE:CODE:NOROOT(1)
-//  150 void int16_div16() {
+//  161 void int16_div16() {
 int16_div16:
         CFI Block cfiBlock19 Using cfiCommon0
         CFI Function int16_div16
-//  151 	i_c = i_a / 16;
+//  162 	i_c = i_a / 16;
         LDI     R30, LOW(i_a)
         LDI     R31, (i_a) >> 8
         LD      R16, Z
@@ -1186,16 +1201,16 @@ int16_div16:
         ROR     R16
         RJMP    ?Subroutine2
         CFI EndBlock cfiBlock19
-//  152 }
-//  153 
+//  163 }
+//  164 
 
         RSEG CODE:CODE:NOROOT(1)
-//  154 void int16_div() {
+//  165 void int16_div() {
 int16_div:
         CFI Block cfiBlock20 Using cfiCommon0
         CFI Function int16_div
         MOVW    R19:R18, R27:R26
-//  155     i_c = i_a / i_b;
+//  166     i_c = i_a / i_b;
         LDI     R26, LOW((i_a + 2))
         LDI     R27, HIGH((i_a + 2))
         LD      R20, X+
@@ -1203,15 +1218,15 @@ int16_div:
         SBIW    R27:R26, 3
         RJMP    ?Subroutine4
         CFI EndBlock cfiBlock20
-//  156 } 
-//  157 
+//  167 } 
+//  168 
 
         RSEG CODE:CODE:NOROOT(1)
-//  158 void int16_mult_const() {
+//  169 void int16_mult_const() {
 int16_mult_const:
         CFI Block cfiBlock21 Using cfiCommon0
         CFI Function int16_mult_const
-//  159     i_c = i_a * 23;
+//  170     i_c = i_a * 23;
         LDI     R30, LOW(i_a)
         LDI     R31, (i_a) >> 8
         LD      R18, Z
@@ -1223,17 +1238,17 @@ int16_mult_const:
         ADD     R17, R1
         STD     Z+4, R0
         STD     Z+5, R17
-//  160 } 
+//  171 } 
         RET
         CFI EndBlock cfiBlock21
-//  161 
+//  172 
 
         RSEG CODE:CODE:NOROOT(1)
-//  162 void int16_mult() {
+//  173 void int16_mult() {
 int16_mult:
         CFI Block cfiBlock22 Using cfiCommon0
         CFI Function int16_mult
-//  163     i_c = i_a * i_b;
+//  174     i_c = i_a * i_b;
         LDI     R30, LOW(i_a)
         LDI     R31, (i_a) >> 8
         LD      R16, Z
@@ -1248,14 +1263,14 @@ int16_mult:
         ADD     R19, R1
         STD     Z+4, R0
         STD     Z+5, R19
-//  164 } 
+//  175 } 
         RET
         CFI EndBlock cfiBlock22
-//  165 
+//  176 
 
         RSEG NEAR_I:DATA:NOROOT(0)
         REQUIRE `?<Segment init: NEAR_I>`
-//  166 unsigned long l_a = 23444, l_b = 23, l_c;
+//  177 unsigned long l_a = 23444, l_b = 23, l_c;
 l_a:
         DS8 4
         REQUIRE `?<Initializer for l_a>`
@@ -1265,10 +1280,10 @@ l_b:
 l_c:
         DS8 4
         REQUIRE `?<Initializer for l_c>`
-//  167 
+//  178 
 
         RSEG CODE:CODE:NOROOT(1)
-//  168 void int32_div10() {
+//  179 void int32_div10() {
 int32_div10:
         CFI Block cfiBlock23 Using cfiCommon0
         CFI Function int32_div10
@@ -1276,7 +1291,7 @@ int32_div10:
         CFI R27 Frame(CFA_Y, -1)
         CFI CFA_Y Y+1
         MOV     R31, R26
-//  169 	l_c = l_a / 10;
+//  180 	l_c = l_a / 10;
         LDI     R26, LOW(l_a)
         LDI     R27, (l_a) >> 8
         LDI     R20, 10
@@ -1286,7 +1301,7 @@ int32_div10:
         CFI EndBlock cfiBlock23
         REQUIRE ?Subroutine1
         ;               // Fall through to label ?Subroutine1
-//  170 }
+//  181 }
 
         RSEG CODE:CODE:NOROOT(1)
 ?Subroutine1:
@@ -1312,14 +1327,14 @@ int32_div10:
         CFI R31 R26
         RET
         CFI EndBlock cfiBlock24
-//  171 
+//  182 
 
         RSEG CODE:CODE:NOROOT(1)
-//  172 void int32_div16() {
+//  183 void int32_div16() {
 int32_div16:
         CFI Block cfiBlock25 Using cfiCommon0
         CFI Function int32_div16
-//  173 	l_c = l_a / 16;
+//  184 	l_c = l_a / 16;
         LDI     R30, LOW(l_a)
         LDI     R31, (l_a) >> 8
         LDI     R20, 4
@@ -1331,7 +1346,7 @@ int32_div16:
         CFI EndBlock cfiBlock25
         REQUIRE ?Subroutine5
         ;               // Fall through to label ?Subroutine5
-//  174 }
+//  185 }
 
         RSEG CODE:CODE:NOROOT(1)
 ?Subroutine5:
@@ -1351,10 +1366,10 @@ int32_div16:
         STD     Z+11, R19
         RET
         CFI EndBlock cfiBlock27
-//  175 
+//  186 
 
         RSEG CODE:CODE:NOROOT(1)
-//  176 void int32_div() {
+//  187 void int32_div() {
 int32_div:
         CFI Block cfiBlock28 Using cfiCommon0
         CFI Function int32_div
@@ -1362,7 +1377,7 @@ int32_div:
         CFI R27 Frame(CFA_Y, -1)
         CFI CFA_Y Y+1
         MOV     R31, R26
-//  177     l_c = l_a / l_b;
+//  188     l_c = l_a / l_b;
         LDI     R26, LOW((l_a + 4))
         LDI     R27, HIGH((l_a + 4))
         LD      R20, X+
@@ -1372,15 +1387,15 @@ int32_div:
         SBIW    R27:R26, 7
         RJMP    ?Subroutine1
         CFI EndBlock cfiBlock28
-//  178 } 
-//  179 
+//  189 } 
+//  190 
 
         RSEG CODE:CODE:NOROOT(1)
-//  180 void int32_mult_const() {
+//  191 void int32_mult_const() {
 int32_mult_const:
         CFI Block cfiBlock29 Using cfiCommon0
         CFI Function int32_mult_const
-//  181     l_c = l_a * 234;
+//  192     l_c = l_a * 234;
         LDI     R30, LOW(l_a)
         LDI     R31, (l_a) >> 8
         LD      R20, Z
@@ -1405,15 +1420,15 @@ int32_mult_const:
         STD     Z+8, R0
         RJMP    ??Subroutine7_0
         CFI EndBlock cfiBlock29
-//  182 } 
-//  183 
+//  193 } 
+//  194 
 
         RSEG CODE:CODE:NOROOT(1)
-//  184 void int32_mult() {
+//  195 void int32_mult() {
 int32_mult:
         CFI Block cfiBlock30 Using cfiCommon0
         CFI Function int32_mult
-//  185     l_c = l_a * l_b;
+//  196     l_c = l_a * l_b;
         LDI     R30, LOW(l_a)
         LDI     R31, (l_a) >> 8
         LD      R16, Z
@@ -1458,18 +1473,18 @@ int32_mult:
         STD     Z+9, R21
         STD     Z+10, R22
         STD     Z+11, R23
-//  186 }
+//  197 }
         RET
         CFI EndBlock cfiBlock30
-//  187 
+//  198 
 
         RSEG CODE:CODE:NOROOT(1)
-//  188 void int32_sqrt() {
+//  199 void int32_sqrt() {
 int32_sqrt:
         CFI Block cfiBlock31 Using cfiCommon0
         CFI Function int32_sqrt
-//  189 	l_c = isqrt(23442342);
-        FUNCALL int32_sqrt, isqrt
+//  200 	l_c = isqrt_c32(23442342);
+        FUNCALL int32_sqrt, isqrt_c32
         LOCFRAME CSTACK, 0, STACK
         LOCFRAME RSTACK, 2, STACK
         ARGFRAME RSTACK, 0, STACK
@@ -1477,46 +1492,50 @@ int32_sqrt:
         LDI     R17, 179
         LDI     R18, 101
         LDI     R19, 1
-        RCALL   isqrt
+        RCALL   isqrt_c32
         LDI     R30, LOW(l_a)
         LDI     R31, (l_a) >> 8
         RJMP    ?Subroutine5
         CFI EndBlock cfiBlock31
-//  190 }
-//  191 
+//  201 }
+//  202 
 
         RSEG CODE:CODE:NOROOT(1)
-//  192 void int32_sqrt_asm() {
+//  203 void int32_sqrt_asm() {
 int32_sqrt_asm:
         CFI Block cfiBlock32 Using cfiCommon0
         CFI Function int32_sqrt_asm
-//  193 #ifndef  __IAR_SYSTEMS_ICC__     
-//  194 	l_c = isqrt32(23442342);
-//  195 #endif
-//  196 }
+//  204 #ifndef  __IAR_SYSTEMS_ICC__ 
+//  205 #ifndef  CODE_VISION    
+//  206 	l_c = isqrt32(23442342);
+//  207 #endif
+//  208 #endif
+//  209 }
         RET
         CFI EndBlock cfiBlock32
-//  197 
+//  210 
 
         RSEG CODE:CODE:NOROOT(1)
-//  198 void int16_sqrt_asm() {
+//  211 void int16_sqrt_asm() {
 int16_sqrt_asm:
         CFI Block cfiBlock33 Using cfiCommon0
         CFI Function int16_sqrt_asm
-//  199 #ifndef  __IAR_SYSTEMS_ICC__       
-//  200 	i_c = isqrt16(23442);
-//  201 #endif        
-//  202 }
+//  212 #ifndef  __IAR_SYSTEMS_ICC__
+//  213 #ifndef  CODE_VISION       
+//  214 	i_c = isqrt16(23442);
+//  215 #endif    
+//  216 #endif    
+//  217 }
         RET
         CFI EndBlock cfiBlock33
-//  203 
+//  218 
 
         RSEG CODE:CODE:NOROOT(1)
-//  204 void int16_sqrt() {
+//  219 void int16_sqrt() {
 int16_sqrt:
         CFI Block cfiBlock34 Using cfiCommon0
         CFI Function int16_sqrt
-//  205 	i_c = isqrt_c16(23442);
+//  220 	i_c = isqrt_c16(23442);
         FUNCALL int16_sqrt, isqrt_c16
         LOCFRAME CSTACK, 0, STACK
         LOCFRAME RSTACK, 2, STACK
@@ -1526,17 +1545,17 @@ int16_sqrt:
         RCALL   isqrt_c16
         STS     (i_a + 4), R16
         STS     (i_a + 5), R17
-//  206 }
+//  221 }
         RET
         CFI EndBlock cfiBlock34
-//  207 
+//  222 
 
         RSEG CODE:CODE:NOROOT(1)
-//  208 void int16_sin() {
+//  223 void int16_sin() {
 int16_sin:
         CFI Block cfiBlock35 Using cfiCommon0
         CFI Function int16_sin
-//  209 	l_c = Sine(0x7FFF/6);
+//  224 	l_c = Sine(0x7FFF/6);
         FUNCALL int16_sin, Sine
         LOCFRAME CSTACK, 0, STACK
         LOCFRAME RSTACK, 2, STACK
@@ -1555,34 +1574,34 @@ int16_sin:
         STD     Z+9, R17
         STD     Z+10, R18
         STD     Z+11, R18
-//  210 }
+//  225 }
         RET
         CFI EndBlock cfiBlock35
-//  211 
-//  212 
+//  226 
+//  227 
 
         RSEG CODE:CODE:NOROOT(1)
-//  213 void empty_func() {
+//  228 void empty_func() {
 empty_func:
         CFI Block cfiBlock36 Using cfiCommon0
         CFI Function empty_func
-//  214 }
+//  229 }
         RET
         CFI EndBlock cfiBlock36
-//  215 
-//  216 #define MAX_U_STELL 1000L
-//  217 int16_t v_soll = 100, v_ist = 80, u_stell;
-//  218 
+//  230 
+//  231 #define MAX_U_STELL 1000L
+//  232 int16_t v_soll = 100, v_ist = 80, u_stell;
+//  233 
 
         RSEG CODE:CODE:NOROOT(1)
-//  219 void int16_pi_regler() {
+//  234 void int16_pi_regler() {
 int16_pi_regler:
         CFI Block cfiBlock37 Using cfiCommon0
         CFI Function int16_pi_regler
-//  220 	static int32_t u_stell_l = 0;
-//  221 	static int16_t reg_abw, reg_abw_old;
-//  222         static uint8_t kp = 50, ki = 15;
-//  223         reg_abw = (v_soll - v_ist);
+//  235 	static int32_t u_stell_l = 0;
+//  236 	static int16_t reg_abw, reg_abw_old;
+//  237         static uint8_t kp = 50, ki = 15;
+//  238         reg_abw = (v_soll - v_ist);
         LDI     R30, LOW(??u_stell_l)
         LDI     R31, (??u_stell_l) >> 8
         LDD     R22, Z+4
@@ -1593,8 +1612,8 @@ int16_pi_regler:
         SBC     R23, R17
         STD     Z+10, R22
         STD     Z+11, R23
-//  224 	// PI-Regeler Geschwindigkeitsalgorithmus 
-//  225 	u_stell_l  += reg_abw*kp + ((reg_abw*ki + 16) >> 5) - reg_abw_old*kp;
+//  239 	// PI-Regeler Geschwindigkeitsalgorithmus 
+//  240 	u_stell_l  += reg_abw*kp + ((reg_abw*ki + 16) >> 5) - reg_abw_old*kp;
         LDD     R16, Z+14
         LDD     R18, Z+12
         LDD     R19, Z+13
@@ -1633,7 +1652,7 @@ int16_pi_regler:
         STD     Z+1, R1
         STD     Z+2, R2
         STD     Z+3, R3
-//  226 	if (u_stell_l > (MAX_U_STELL << 5))
+//  241 	if (u_stell_l > (MAX_U_STELL << 5))
         MOVW    R17:R16, R1:R0
         MOVW    R19:R18, R3:R2
         CPI     R16, 1
@@ -1643,11 +1662,11 @@ int16_pi_regler:
         CPC     R18, R20
         CPC     R19, R20
         BRLT    ??int16_pi_regler_0
-//  227             u_stell_l = MAX_U_STELL << 5;
+//  242             u_stell_l = MAX_U_STELL << 5;
         LDI     R17, 125
         ST      Z, R20
         RJMP    ??int16_pi_regler_1
-//  228         else if (u_stell_l < -(MAX_U_STELL << 5))
+//  243         else if (u_stell_l < -(MAX_U_STELL << 5))
 ??int16_pi_regler_0:
         CPI     R16, 0
         SBCI    R17, 131
@@ -1655,7 +1674,7 @@ int16_pi_regler:
         SBCI    R18, 255
         SBCI    R19, 255
         BRGE    ??int16_pi_regler_2
-//  229             u_stell_l = -(MAX_U_STELL << 5); 
+//  244             u_stell_l = -(MAX_U_STELL << 5); 
         LDI     R16, 0
         LDI     R17, 131
         ST      Z, R16
@@ -1663,7 +1682,7 @@ int16_pi_regler:
         STD     Z+1, R17
         STD     Z+2, R20
         STD     Z+3, R20
-//  230         u_stell     = u_stell_l >> 5;
+//  245         u_stell     = u_stell_l >> 5;
 ??int16_pi_regler_2:
         LDI     R20, 5
         LD      R16, Z
@@ -1673,10 +1692,10 @@ int16_pi_regler:
         CALL    ?SL_SHR_L03
         STD     Z+8, R16
         STD     Z+9, R17
-//  231 	reg_abw_old = reg_abw; 
+//  246 	reg_abw_old = reg_abw; 
         STD     Z+12, R22
         STD     Z+13, R23
-//  232 }
+//  247 }
         RET
         CFI EndBlock cfiBlock37
 
@@ -1702,30 +1721,32 @@ u_stell:
         REQUIRE `?<Initializer for kp>`
         DS8 1
         REQUIRE `?<Initializer for ki>`
-//  233 
-//  234 #ifdef  __IAR_SYSTEMS_ICC__
-//  235 /* This port correponds to the "-W 0x20,-" command line option. */
-//  236 #define special_output_port (*((__io *) SIM_WIO))
-//  237 /* This port correponds to the "-R 0x22,-" command line option. */
-//  238 #define special_input_port  (*((__io *) SIM_RIO))
-//  239 #else
-//  240 /* This port correponds to the "-W 0x20,-" command line option. */
-//  241 #define special_output_port (*((volatile char *) SIM_WIO))
-//  242 /* This port correponds to the "-R 0x22,-" command line option. */
-//  243 #define special_input_port  (*((volatile char *) SIM_RIO))
-//  244 #endif
-//  245 
-//  246 static void PrintString(const char* str) {
-//  247 	const char *c;
-//  248 #ifndef  __IAR_SYSTEMS_ICC__
-//  249 	for(c = str; *c; c++)
-//  250 	  special_output_port = *c;
-//  251 #endif
-//  252 }
-//  253 
+//  248 
+//  249 #ifdef  __IAR_SYSTEMS_ICC__
+//  250 /* This port correponds to the "-W 0x20,-" command line option. */
+//  251 #define special_output_port (*((__io *) SIM_WIO))
+//  252 /* This port correponds to the "-R 0x22,-" command line option. */
+//  253 #define special_input_port  (*((__io *) SIM_RIO))
+//  254 #else
+//  255 /* This port correponds to the "-W 0x20,-" command line option. */
+//  256 #define special_output_port (*((volatile char *) SIM_WIO))
+//  257 /* This port correponds to the "-R 0x22,-" command line option. */
+//  258 #define special_input_port  (*((volatile char *) SIM_RIO))
+//  259 #endif
+//  260 
+//  261 static void PrintString(char* str) {
+//  262 	const char *c;
+//  263 #ifndef  __IAR_SYSTEMS_ICC__
+//  264 #ifndef  CODE_VISION
+//  265 	for(c = str; *c; c++)
+//  266 	  special_output_port = *c;
+//  267 #endif
+//  268 #endif
+//  269 }
+//  270 
 
         RSEG CODE:CODE:NOROOT(1)
-//  254 static void PrintSignedShortFormated(signed short value) {
+//  271 static void PrintSignedShortFormated(signed short value) {
 PrintSignedShortFormated:
         CFI Block cfiBlock38 Using cfiCommon0
         CFI Function PrintSignedShortFormated
@@ -1734,45 +1755,45 @@ PrintSignedShortFormated:
         CFI R22 R24
         CFI CFA_Y Y+7
         MOVW    R19:R18, R17:R16
-//  255     unsigned char sBuf0[7];
-//  256     unsigned char *sBuf = &sBuf0[6];
+//  272     unsigned char sBuf0[7];
+//  273     unsigned char *sBuf = &sBuf0[6];
         MOVW    R31:R30, R29:R28
         ADIW    R31:R30, 6
-//  257     unsigned char  minus;
-//  258     unsigned short valueAlt;   // Alte Wert für schneller % 10 Berechnung
-//  259     unsigned short valueCalc;  // muss unsigned weil signed short kann kein 32768
-//  260     
-//  261     *sBuf = 0;       // String Terminierung
-//  262     if (value < 0) { // Vorzeichen behandeln
+//  274     unsigned char  minus;
+//  275     unsigned short valueAlt;   // Alte Wert für schneller % 10 Berechnung
+//  276     unsigned short valueCalc;  // muss unsigned weil signed short kann kein 32768
+//  277     
+//  278     *sBuf = 0;       // String Terminierung
+//  279     if (value < 0) { // Vorzeichen behandeln
         TST     R17
         BRPL    ??PrintSignedShortFormated_0
-//  263       minus = '-';
+//  280       minus = '-';
         LDI     R24, 45
-//  264       valueCalc = -value;
+//  281       valueCalc = -value;
         NEG     R19
         NEG     R18
         SBCI    R19, 0
         MOVW    R17:R16, R19:R18
         RJMP    ??PrintSignedShortFormated_1
-//  265     } else {
-//  266       minus = ' ';
+//  282     } else {
+//  283       minus = ' ';
 ??PrintSignedShortFormated_0:
         LDI     R24, 32
-//  267       valueCalc = value;
-//  268     }
-//  269     if (!valueCalc) 
+//  284       valueCalc = value;
+//  285     }
+//  286     if (!valueCalc) 
 ??PrintSignedShortFormated_1:
         MOV     R18, R16
         OR      R18, R17
         BRNE    ??PrintSignedShortFormated_2
-//  270       *--sBuf = '0';
+//  287       *--sBuf = '0';
         MOVW    R31:R30, R29:R28
         ADIW    R31:R30, 5
         RJMP    ??PrintSignedShortFormated_3
-//  271     else while (valueCalc) {
-//  272       valueAlt = valueCalc;
-//  273       //  schneller als valueCalc /= 10;
-//  274       valueCalc = div10(valueCalc); 
+//  288     else while (valueCalc) {
+//  289       valueAlt = valueCalc;
+//  290       //  schneller als valueCalc /= 10;
+//  291       valueCalc = div10(valueCalc); 
 ??PrintSignedShortFormated_2:
         MOVW    R21:R20, R17:R16
         LDI     R16, 205
@@ -1799,8 +1820,8 @@ PrintSignedShortFormated:
         ROR     R16
         LSR     R17
         ROR     R16
-//  275       // schneller als  *--sBuf = '0' + (valueAlt % 10)
-//  276       *--sBuf = '0' + valueAlt - (valueCalc * 10); 
+//  292       // schneller als  *--sBuf = '0' + (valueAlt % 10)
+//  293       *--sBuf = '0' + valueAlt - (valueCalc * 10); 
         MOV     R18, R20
         SUBI    R18, 208
         MOV     R20, R16
@@ -1808,42 +1829,42 @@ PrintSignedShortFormated:
         MUL     R20, R19
         SUB     R18, R0
         ST      -Z, R18
-//  277     } 
+//  294     } 
         MOV     R18, R16
         OR      R18, R17
         BRNE    ??PrintSignedShortFormated_2
-//  278     *--sBuf = minus;                  // Minuszeichen vor die höchstwertigste Stelle setzen
+//  295     *--sBuf = minus;                  // Minuszeichen vor die höchstwertigste Stelle setzen
 ??PrintSignedShortFormated_3:
         ST      -Z, R24
         MOVW    R17:R16, R29:R28
-//  279     while (sBuf > sBuf0)              // mit Leerzeichen auffüllen (für Formatierung)  
+//  296     while (sBuf > sBuf0)              // mit Leerzeichen auffüllen (für Formatierung)  
         CP      R16, R30
         CPC     R17, R31
         BRCC    ??PrintSignedShortFormated_4
-//  280       *--sBuf = ' ';
+//  297       *--sBuf = ' ';
 ??PrintSignedShortFormated_5:
         LDI     R18, 32
         ST      -Z, R18
         CP      R16, R30
         CPC     R17, R31
         BRCS    ??PrintSignedShortFormated_5
-//  281     PrintString((const char*) sBuf0); // String ausgeben
-//  282 }
+//  298     PrintString(sBuf0); // String ausgeben
+//  299 }
 ??PrintSignedShortFormated_4:
         ADIW    R29:R28, 7
         CFI CFA_Y Y+0
         MOV     R24, R22
         RET
         CFI EndBlock cfiBlock38
-//  283 
-//  284 
+//  300 
+//  301 
 
         RSEG CODE:CODE:NOROOT(1)
-//  285 void print_int16(void) {
+//  302 void print_int16(void) {
 print_int16:
         CFI Block cfiBlock39 Using cfiCommon0
         CFI Function print_int16
-//  286 	PrintSignedShortFormated(-32421);
+//  303 	PrintSignedShortFormated(-32421);
         FUNCALL print_int16, PrintSignedShortFormated
         LOCFRAME CSTACK, 0, STACK
         LOCFRAME RSTACK, 2, STACK
@@ -1852,108 +1873,110 @@ print_int16:
         LDI     R17, 129
         RJMP    PrintSignedShortFormated
         CFI EndBlock cfiBlock39
-//  287 }
-//  288 
+//  304 }
+//  305 
 
         RSEG CODE:CODE:NOROOT(1)
-//  289 void print_int16_itoa(void) {
+//  306 void print_int16_itoa(void) {
 print_int16_itoa:
         CFI Block cfiBlock40 Using cfiCommon0
         CFI Function print_int16_itoa
-//  290 	unsigned char sbuf[7];
-//  291 #ifndef  __IAR_SYSTEMS_ICC__    
-//  292 	itoa(-32421, sbuf, 10);
-//  293 #endif
-//  294 	PrintString((const char*) sbuf);
-//  295 }
+//  307 	unsigned char sbuf[7];
+//  308 #ifndef  __IAR_SYSTEMS_ICC__
+//  309 #ifndef  CODE_VISION  
+//  310 	itoa(-32421, sbuf, 10);
+//  311 #endif
+//  312 #endif
+//  313 	PrintString(sbuf);
+//  314 }
         RET
         CFI EndBlock cfiBlock40
-//  296 
+//  315 
 
         RSEG NEAR_Z:DATA:NOROOT(0)
         REQUIRE `?<Segment init: NEAR_Z>`
-//  297 uint16_t buffer[10][10];
+//  316 uint16_t buffer[10][10];
 buffer:
         DS8 200
-//  298 
+//  317 
 
         RSEG CODE:CODE:NOROOT(1)
-//  299 void testData() {
+//  318 void testData() {
 testData:
         CFI Block cfiBlock41 Using cfiCommon0
         CFI Function testData
         MOVW    R21:R20, R27:R26
         MOVW    R19:R18, R25:R24
-//  300   	uint8_t x, y;
-//  301   	for (x = 0; x < 10; x++) {
+//  319   	uint8_t x, y;
+//  320   	for (x = 0; x < 10; x++) {
         LDI     R16, 0
         LDI     R24, LOW(buffer)
         LDI     R25, (buffer) >> 8
-//  302             for (y = 0; y < 10; y++) {
+//  321             for (y = 0; y < 10; y++) {
 ??testData_0:
         MOVW    R31:R30, R25:R24
         MOV     R26, R16
         LDI     R27, 0
         LDI     R17, 10
-//  303                 buffer[x][y] = x + y*10;
+//  322                 buffer[x][y] = x + y*10;
 ??testData_1:
         ST      Z+, R26
         ST      Z+, R27
-//  304             }
+//  323             }
         ADIW    R27:R26, 10
         DEC     R17
         BRNE    ??testData_1
-//  305   	}	
+//  324   	}	
         INC     R16
         ADIW    R25:R24, 20
         CPI     R16, 10
         BRCS    ??testData_0
-//  306 }
+//  325 }
         MOVW    R25:R24, R19:R18
         MOVW    R27:R26, R21:R20
         RET
         CFI EndBlock cfiBlock41
-//  307 
+//  326 
 
         RSEG CODE:CODE:NOROOT(1)
-//  308 void test_loop1() {
+//  327 void test_loop1() {
 test_loop1:
         CFI Block cfiBlock42 Using cfiCommon0
         CFI Function test_loop1
         MOV     R17, R25
         MOV     R20, R24
-//  309   	uint8_t x, y;
-//  310   	for (x = 0; x < 10; x++) {
+//  328   	uint8_t x, y;
+//  329   	for (x = 0; x < 10; x++) {
         LDI     R24, LOW(buffer)
         LDI     R25, (buffer) >> 8
         LDI     R19, 10
-//  311             for (y = 0; y < 10; y++) {
+//  330             for (y = 0; y < 10; y++) {
 ??test_loop1_0:
         MOVW    R31:R30, R25:R24
         LDI     R18, 10
         LDI     R16, 0
-//  312                 buffer[x][y] = 0;
+//  331                 buffer[x][y] = 0;
 ??test_loop1_1:
         ST      Z+, R16
         ST      Z+, R16
-//  313             }
+//  332             }
         DEC     R18
         BRNE    ??test_loop1_1
-//  314   	}	
+//  333   	}	
         ADIW    R25:R24, 20
         DEC     R19
         BRNE    ??test_loop1_0
-//  315 }
+//  334 }
         MOV     R24, R20
         MOV     R25, R17
         RET
         CFI EndBlock cfiBlock42
-//  316 
+//  335 
 
         RSEG CODE:CODE:NOROOT(1)
-//  317 void test_loop2() {
+//  336 void test_loop2() {
 test_loop2:
-//  318   	uint16_t *ptr = (uint16_t *) buffer; 
+//  337   	uint16_t *ptr = (uint16_t *) buffer; 
         REQUIRE ?Subroutine3
         ;               // Fall through to label ?Subroutine3
 
@@ -1963,125 +1986,125 @@ test_loop2:
         CFI NoFunction
         LDI     R30, LOW(buffer)
         LDI     R31, (buffer) >> 8
-//  319   	uint8_t x;
-//  320   	for (x = 0; x < 10*10; x++) {
+//  338   	uint8_t x;
+//  339   	for (x = 0; x < 10*10; x++) {
         LDI     R18, 100
         LDI     R16, 0
-//  321      	    *ptr++ = 0;
+//  340      	    *ptr++ = 0;
 ??Subroutine3_0:
         ST      Z+, R16
         ST      Z+, R16
         DEC     R18
         BRNE    ??Subroutine3_0
-//  322   	}
-//  323 }
+//  341   	}
+//  342 }
         RET
         CFI EndBlock cfiBlock43
-//  324 
+//  343 
 
         RSEG CODE:CODE:NOROOT(1)
-//  325 void test_loop3() {
+//  344 void test_loop3() {
 test_loop3:
         CFI Block cfiBlock44 Using cfiCommon0
         CFI Function test_loop3
-//  326   	uint16_t *ptr = (uint16_t *) buffer; 
+//  345   	uint16_t *ptr = (uint16_t *) buffer; 
         RJMP    ?Subroutine3
         CFI EndBlock cfiBlock44
-//  327   	uint8_t x = 10*10;
-//  328   	while (x--) {
-//  329      	    *ptr++ = 0;
-//  330   	}
-//  331 }
-//  332 
+//  346   	uint8_t x = 10*10;
+//  347   	while (x--) {
+//  348      	    *ptr++ = 0;
+//  349   	}
+//  350 }
+//  351 
 
         RSEG CODE:CODE:NOROOT(1)
-//  333 void test_loop4() {
+//  352 void test_loop4() {
 test_loop4:
         CFI Block cfiBlock45 Using cfiCommon0
         CFI Function test_loop4
-//  334   	uint8_t x = 10;
-//  335   	uint16_t *ptr = (uint16_t *) buffer; 
+//  353   	uint8_t x = 10;
+//  354   	uint16_t *ptr = (uint16_t *) buffer; 
         LDI     R30, LOW(buffer)
         LDI     R31, (buffer) >> 8
         LDI     R18, 10
         LDI     R16, 0
-//  336    	do {
-//  337    		*ptr++ = 0;
+//  355    	do {
+//  356    		*ptr++ = 0;
 ??test_loop4_0:
         ST      Z+, R16
         ST      Z+, R16
-//  338    		*ptr++ = 0;
+//  357    		*ptr++ = 0;
         ST      Z+, R16
         ST      Z+, R16
-//  339    		*ptr++ = 0; 
+//  358    		*ptr++ = 0; 
         ST      Z+, R16
         ST      Z+, R16
-//  340    		*ptr++ = 0; 
+//  359    		*ptr++ = 0; 
         ST      Z+, R16
         ST      Z+, R16
-//  341    		*ptr++ = 0; 
+//  360    		*ptr++ = 0; 
         ST      Z+, R16
         ST      Z+, R16
-//  342    		*ptr++ = 0; 
+//  361    		*ptr++ = 0; 
         ST      Z+, R16
         ST      Z+, R16
-//  343    		*ptr++ = 0; 
+//  362    		*ptr++ = 0; 
         ST      Z+, R16
         ST      Z+, R16
-//  344    		*ptr++ = 0; 
+//  363    		*ptr++ = 0; 
         ST      Z+, R16
         ST      Z+, R16
-//  345    		*ptr++ = 0; 
+//  364    		*ptr++ = 0; 
         ST      Z+, R16
         ST      Z+, R16
-//  346    		*ptr++ = 0; 		
+//  365    		*ptr++ = 0; 		
         ST      Z+, R16
         ST      Z+, R16
-//  347    	} while (--x);
+//  366    	} while (--x);
         DEC     R18
         BRNE    ??test_loop4_0
-//  348 }
+//  367 }
         RET
         CFI EndBlock cfiBlock45
-//  349 
-//  350 /*
-//  351 static void PrintSignedShort(signed short value) {
-//  352     unsigned char sBuf0[7];
-//  353     unsigned char *sBuf = &sBuf0[6];
-//  354     unsigned char x = 6, minus;
-//  355     unsigned short valueAlt;   // Alte Wert für schneller % 10 Berechnung
-//  356     unsigned short valueCalc;  // muss unsigned weil signed short kann kein 32768
-//  357     
-//  358     *sBuf = 0;
-//  359     if (value < 0) { // Vorzeichen behandeln
-//  360       minus = 1;
-//  361       valueCalc = -value;
-//  362     } else {
-//  363       minus = 0;
-//  364       valueCalc = value;
-//  365     }
-//  366     do {
-//  367       valueAlt = valueCalc;
-//  368       valueCalc = div10(valueCalc); //  schneller als valueCalc /= 10;
-//  369       *--sBuf = '0' + valueAlt - (valueCalc * 10); // schneller als  *--sBuf = '0' + (valueAlt % 10)
-//  370     } while (valueCalc);
-//  371     if (minus)
-//  372 		*--sBuf = '-';                // Minuszeichen vor die höchstwertigste Stelle setzen
-//  373     PrintString((const char*) sBuf0); // String ausgeben
-//  374 }
-//  375 */
-//  376 
-//  377 // typedef void (*test_func_t)(void);
-//  378 #define TIME_FUNC(func) print_execute_time(func, "" # func) 
-//  379 
+//  368 
+//  369 /*
+//  370 static void PrintSignedShort(signed short value) {
+//  371     unsigned char sBuf0[7];
+//  372     unsigned char *sBuf = &sBuf0[6];
+//  373     unsigned char x = 6, minus;
+//  374     unsigned short valueAlt;   // Alte Wert für schneller % 10 Berechnung
+//  375     unsigned short valueCalc;  // muss unsigned weil signed short kann kein 32768
+//  376     
+//  377     *sBuf = 0;
+//  378     if (value < 0) { // Vorzeichen behandeln
+//  379       minus = 1;
+//  380       valueCalc = -value;
+//  381     } else {
+//  382       minus = 0;
+//  383       valueCalc = value;
+//  384     }
+//  385     do {
+//  386       valueAlt = valueCalc;
+//  387       valueCalc = div10(valueCalc); //  schneller als valueCalc /= 10;
+//  388       *--sBuf = '0' + valueAlt - (valueCalc * 10); // schneller als  *--sBuf = '0' + (valueAlt % 10)
+//  389     } while (valueCalc);
+//  390     if (minus)
+//  391 		*--sBuf = '-';                // Minuszeichen vor die höchstwertigste Stelle setzen
+//  392     PrintString((const char*) sBuf0); // String ausgeben
+//  393 }
+//  394 */
+//  395 
+//  396 // typedef void (*test_func_t)(void);
+//  397 #define TIME_FUNC(func) print_execute_time(func, (unsigned char*) "" # func) 
+//  398 
 
         RSEG CODE:CODE:NOROOT(1)
-//  380 unsigned short print_execute_time(test_func_t function, char name[]) {
+//  399 unsigned short print_execute_time(test_func_t function, char name[]) {
 print_execute_time:
         CFI Block cfiBlock46 Using cfiCommon0
         CFI Function print_execute_time
-//  381 	// Timer anhalten und initialisieren
-//  382 	TCCR1A = 0;
+//  400 	// Timer anhalten und initialisieren
+//  401 	TCCR1A = 0;
         FUNCALL print_execute_time
         LOCFRAME CSTACK, 0, STACK
         LOCFRAME RSTACK, 2, STACK
@@ -2092,33 +2115,33 @@ print_execute_time:
         ARGFRAME RSTACK, 0, STACK
         LDI     R18, 0
         OUT     0x2F, R18
-//  383 	TCCR1B = 0;
+//  402 	TCCR1B = 0;
         OUT     0x2E, R18
-//  384 	TCNT1  = 0;
+//  403 	TCNT1  = 0;
         OUT     0x2D, R18
         OUT     0x2C, R18
-//  385 	TIFR   = 0;
+//  404 	TIFR   = 0;
         OUT     0x36, R18
-//  386 	TCCR1B = 1; // prescaler 1 Timer starten
+//  405 	TCCR1B = 1; // prescaler 1 Timer starten
         LDI     R18, 1
         OUT     0x2E, R18
-//  387 	function();
+//  406 	function();
         MOVW    R31:R30, R17:R16
         ICALL
-//  388 	TCCR1B = 0; // Timer stoppen
+//  407 	TCCR1B = 0; // Timer stoppen
         LDI     R16, 0
         OUT     0x2E, R16
-//  389 	PrintSignedShortFormated(TCNT1);
+//  408 	PrintSignedShortFormated(TCNT1);
         IN      R16, 0x2C
         IN      R17, 0x2D
         RCALL   PrintSignedShortFormated
-//  390 	PrintString(" : ");
-//  391 	PrintString(name);
-//  392 	if (TIFR & (1 << 2))
+//  409 	PrintString(" : ");
+//  410 	PrintString(name);
+//  411 	if (TIFR & (1 << 2))
         IN      R16, 0x36
-//  393 		PrintString(" (Timeroverflow!)");	
-//  394 	PrintString("\n");
-//  395 	return TCNT1;
+//  412 		PrintString(" (Timeroverflow!)");	
+//  413 	PrintString("\n");
+//  414 	return TCNT1;
         IN      R16, 0x2C
         IN      R17, 0x2D
         RET
@@ -2127,25 +2150,27 @@ print_execute_time:
         REQUIRE _A_TCCR1B
         REQUIRE _A_TCNT1
         REQUIRE _A_TIFR
-//  396 }
-//  397 
-//  398 static void assert_(uint8_t compareTrue, uint16_t line) {
-//  399     if (!compareTrue) {
-//  400       PrintString("Assert Error in Line ");
-//  401       PrintSignedShortFormated(line);
-//  402       PrintString("\n");
-//  403     }
-//  404 }
-//  405 
+//  415 }
+//  416 
+//  417 static void assert_(uint8_t compareTrue, uint16_t line) {
+//  418     if (!compareTrue) {
+//  419       PrintString("Assert Error in Line ");
+//  420       PrintSignedShortFormated(line);
+//  421       PrintString("\n");
+//  422     }
+//  423 }
+//  424 
+//  425 extern void chg_registers();
+//  426 
 
         RSEG CODE:CODE:NOROOT(1)
-//  406 int main() {
+//  427 void main() {
 main:
         CFI Block cfiBlock47 Using cfiCommon0
         CFI Function main
-//  407 	PrintString("\nZeitmessung Rechenoperationen\n");
-//  408 	PrintString("\n Takte   Funktionsname\n");
-//  409 	TIME_FUNC(float_convert_to_float);
+//  428 	PrintString("\nZeitmessung Rechenoperationen\n");
+//  429 	PrintString("\n Takte   Funktionsname\n");
+//  430 	TIME_FUNC(float_convert_to_float);
         FUNCALL main, print_execute_time
         LOCFRAME CSTACK, 0, STACK
         LOCFRAME RSTACK, 2, STACK
@@ -2298,243 +2323,251 @@ main:
         LOCFRAME CSTACK, 0, STACK
         LOCFRAME RSTACK, 2, STACK
         ARGFRAME RSTACK, 0, STACK
+        FUNCALL main, print_execute_time
+        LOCFRAME CSTACK, 0, STACK
+        LOCFRAME RSTACK, 2, STACK
+        ARGFRAME RSTACK, 0, STACK
         LDI     R18, LOW(`?<Constant "float_convert_to_float">`)
         LDI     R19, (`?<Constant "float_convert_to_float">`) >> 8
         LDI     R16, LOW(float_convert_to_float/2)
         LDI     R17, (float_convert_to_float/2) >> 8
         RCALL   print_execute_time
-//  410 	TIME_FUNC(float_convert_to_int);
+//  431 	TIME_FUNC(float_convert_to_int);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 23))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 23))
         LDI     R16, LOW(float_convert_to_int/2)
         LDI     R17, (float_convert_to_int/2) >> 8
         RCALL   print_execute_time
-//  411 	TIME_FUNC(float_add_const);
+//  432 	TIME_FUNC(float_add_const);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 44))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 44))
         LDI     R16, LOW(float_add_const/2)
         LDI     R17, (float_add_const/2) >> 8
         RCALL   print_execute_time
-//  412 	TIME_FUNC(float_add);
+//  433 	TIME_FUNC(float_add);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 60))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 60))
         LDI     R16, LOW(float_add/2)
         LDI     R17, (float_add/2) >> 8
         RCALL   print_execute_time
-//  413 	TIME_FUNC(float_mul_const);
+//  434 	TIME_FUNC(float_mul_const);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 70))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 70))
         LDI     R16, LOW(float_mul_const/2)
         LDI     R17, (float_mul_const/2) >> 8
         RCALL   print_execute_time
-//  414 	TIME_FUNC(float_mul);
+//  435 	TIME_FUNC(float_mul);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 86))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 86))
         LDI     R16, LOW(float_mul/2)
         LDI     R17, (float_mul/2) >> 8
         RCALL   print_execute_time
-//  415 	TIME_FUNC(float_div_const);
+//  436 	TIME_FUNC(float_div_const);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 96))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 96))
         LDI     R16, LOW(float_div_const/2)
         LDI     R17, (float_div_const/2) >> 8
         RCALL   print_execute_time
-//  416 	TIME_FUNC(float_div);
+//  437 	TIME_FUNC(float_div);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 112))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 112))
         LDI     R16, LOW(float_div/2)
         LDI     R17, (float_div/2) >> 8
         RCALL   print_execute_time
-//  417 	TIME_FUNC(int16_div10);
+//  438 	TIME_FUNC(int16_div10);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 122))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 122))
         LDI     R16, LOW(int16_div10/2)
         LDI     R17, (int16_div10/2) >> 8
         RCALL   print_execute_time
-//  418     //assert_(i_c == 234, __LINE__);
-//  419 	TIME_FUNC(int16_div10_fast);
+//  439     //assert_(i_c == 234, __LINE__);
+//  440 	TIME_FUNC(int16_div10_fast);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 134))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 134))
         LDI     R16, LOW(int16_div10_fast/2)
         LDI     R17, (int16_div10_fast/2) >> 8
         RCALL   print_execute_time
-//  420     //assert_(i_c == 234, __LINE__);
-//  421 	TIME_FUNC(int16_div16);
+//  441     //assert_(i_c == 234, __LINE__);
+//  442 	TIME_FUNC(int16_div16);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 151))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 151))
         LDI     R16, LOW(int16_div16/2)
         LDI     R17, (int16_div16/2) >> 8
         RCALL   print_execute_time
-//  422 	TIME_FUNC(int16_div);
+//  443 	TIME_FUNC(int16_div);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 163))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 163))
         LDI     R16, LOW(int16_div/2)
         LDI     R17, (int16_div/2) >> 8
         RCALL   print_execute_time
-//  423 	TIME_FUNC(int16_mult_const);
+//  444 	TIME_FUNC(int16_mult_const);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 173))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 173))
         LDI     R16, LOW(int16_mult_const/2)
         LDI     R17, (int16_mult_const/2) >> 8
         RCALL   print_execute_time
-//  424     //assert_(i_c == 53912, __LINE__);
-//  425 	TIME_FUNC(int16_mult);
+//  445     //assert_(i_c == 53912, __LINE__);
+//  446 	TIME_FUNC(int16_mult);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 190))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 190))
         LDI     R16, LOW(int16_mult/2)
         LDI     R17, (int16_mult/2) >> 8
         RCALL   print_execute_time
-//  426     //assert_(i_c == 53912, __LINE__);	
-//  427 	TIME_FUNC(int32_div10);
+//  447     //assert_(i_c == 53912, __LINE__);	
+//  448 	TIME_FUNC(int32_div10);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 201))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 201))
         LDI     R16, LOW(int32_div10/2)
         LDI     R17, (int32_div10/2) >> 8
         RCALL   print_execute_time
-//  428     //assert_(l_c == 2344, __LINE__);
-//  429 	TIME_FUNC(int32_div16);
+//  449     //assert_(l_c == 2344, __LINE__);
+//  450 	TIME_FUNC(int32_div16);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 213))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 213))
         LDI     R16, LOW(int32_div16/2)
         LDI     R17, (int32_div16/2) >> 8
         RCALL   print_execute_time
-//  430 	TIME_FUNC(int32_div);
+//  451 	TIME_FUNC(int32_div);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 225))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 225))
         LDI     R16, LOW(int32_div/2)
         LDI     R17, (int32_div/2) >> 8
         RCALL   print_execute_time
-//  431 	TIME_FUNC(int32_mult_const);
+//  452 	TIME_FUNC(int32_mult_const);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 235))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 235))
         LDI     R16, LOW(int32_mult_const/2)
         LDI     R17, (int32_mult_const/2) >> 8
         RCALL   print_execute_time
-//  432 	TIME_FUNC(float_sqrt);
+//  453 	TIME_FUNC(float_sqrt);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 252))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 252))
         LDI     R16, LOW(float_sqrt/2)
         LDI     R17, (float_sqrt/2) >> 8
         RCALL   print_execute_time
-//  433 	TIME_FUNC(int16_sqrt);
+//  454 	TIME_FUNC(int16_sqrt);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 263))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 263))
         LDI     R16, LOW(int16_sqrt/2)
         LDI     R17, (int16_sqrt/2) >> 8
         RCALL   print_execute_time
-//  434     //assert_(i_c == 153, __LINE__);
-//  435 	TIME_FUNC(int16_sqrt_asm);
+//  455     //assert_(i_c == 153, __LINE__);
+//  456 	TIME_FUNC(int16_sqrt_asm);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 274))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 274))
         LDI     R16, LOW(int16_sqrt_asm/2)
         LDI     R17, (int16_sqrt_asm/2) >> 8
         RCALL   print_execute_time
-//  436     //assert_(i_c == 153, __LINE__);	
-//  437 	TIME_FUNC(int32_sqrt);
+//  457     //assert_(i_c == 153, __LINE__);	
+//  458 	TIME_FUNC(int32_sqrt);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 289))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 289))
         LDI     R16, LOW(int32_sqrt/2)
         LDI     R17, (int32_sqrt/2) >> 8
         RCALL   print_execute_time
-//  438     //assert_(l_c == 4841, __LINE__);
-//  439 	TIME_FUNC(int32_sqrt_asm);
+//  459     //assert_(l_c == 4841, __LINE__);
+//  460 	TIME_FUNC(int32_sqrt_asm);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 300))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 300))
         LDI     R16, LOW(int32_sqrt_asm/2)
         LDI     R17, (int32_sqrt_asm/2) >> 8
         RCALL   print_execute_time
-//  440     //assert_(l_c == 4841, __LINE__);
-//  441 	TIME_FUNC(float_sin);
+//  461     //assert_(l_c == 4841, __LINE__);
+//  462 	TIME_FUNC(float_sin);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 315))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 315))
         LDI     R16, LOW(float_sin/2)
         LDI     R17, (float_sin/2) >> 8
         RCALL   print_execute_time
-//  442 	TIME_FUNC(int16_sin);
+//  463 	TIME_FUNC(int16_sin);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 325))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 325))
         LDI     R16, LOW(int16_sin/2)
         LDI     R17, (int16_sin/2) >> 8
         RCALL   print_execute_time
-//  443     testData();
+//  464     testData();
         RCALL   testData
-//  444 	TIME_FUNC(test_loop1);
+//  465 	TIME_FUNC(test_loop1);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 335))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 335))
         LDI     R16, LOW(test_loop1/2)
         LDI     R17, (test_loop1/2) >> 8
         RCALL   print_execute_time
-//  445     //assert_(buffer[9][9] == 0, __LINE__);
-//  446 	testData();
+//  466     //assert_(buffer[9][9] == 0, __LINE__);
+//  467 	testData();
         RCALL   testData
-//  447     TIME_FUNC(test_loop2);
+//  468     TIME_FUNC(test_loop2);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 346))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 346))
         LDI     R16, LOW(test_loop2/2)
         LDI     R17, (test_loop2/2) >> 8
         RCALL   print_execute_time
-//  448     //assert_(buffer[9][9] == 0, __LINE__);
-//  449 	testData();
+//  469     //assert_(buffer[9][9] == 0, __LINE__);
+//  470 	testData();
         RCALL   testData
-//  450     TIME_FUNC(test_loop3);
+//  471     TIME_FUNC(test_loop3);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 357))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 357))
         LDI     R16, LOW(test_loop3/2)
         LDI     R17, (test_loop3/2) >> 8
         RCALL   print_execute_time
-//  451     //assert_(buffer[9][9] == 0, __LINE__);
-//  452 	testData();
+//  472     //assert_(buffer[9][9] == 0, __LINE__);
+//  473 	testData();
         RCALL   testData
-//  453     TIME_FUNC(test_loop4);
+//  474     TIME_FUNC(test_loop4);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 368))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 368))
         LDI     R16, LOW(test_loop4/2)
         LDI     R17, (test_loop4/2) >> 8
         RCALL   print_execute_time
-//  454     assert_(buffer[9][9] == 0, __LINE__);
+//  475     assert_(buffer[9][9] == 0, __LINE__);
         LDS     R16, (buffer + 198)
         LDS     R17, (buffer + 199)
         OR      R16, R17
         BREQ    ??main_0
-        LDI     R16, 198
+        LDI     R16, 219
         LDI     R17, 1
         RCALL   PrintSignedShortFormated
-//  455     TIME_FUNC(int16_pi_regler);    
+//  476     TIME_FUNC(int16_pi_regler);    
 ??main_0:
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 379))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 379))
         LDI     R16, LOW(int16_pi_regler/2)
         LDI     R17, (int16_pi_regler/2) >> 8
         RCALL   print_execute_time
-//  456 	TIME_FUNC(empty_func);  
+//  477 	TIME_FUNC(empty_func);  
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 395))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 395))
         LDI     R16, LOW(empty_func/2)
         LDI     R17, (empty_func/2) >> 8
         RCALL   print_execute_time
-//  457 	TIME_FUNC(print_int16);
+//  478 	TIME_FUNC(print_int16);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 406))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 406))
         LDI     R16, LOW(print_int16/2)
         LDI     R17, (print_int16/2) >> 8
         RCALL   print_execute_time
-//  458 	TIME_FUNC(print_int16_itoa);
+//  479 	TIME_FUNC(print_int16_itoa);
         LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 418))
         LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 418))
         LDI     R16, LOW(print_int16_itoa/2)
         LDI     R17, (print_int16_itoa/2) >> 8
         RCALL   print_execute_time
-//  459 	//PrintString(" - sqrt(23442.0)  = ");
-//  460 	//PrintSignedShortFormated(sqrt(23442.0));	
-//  461 	//PrintString("\n - isqrt16(23442) = ");
-//  462 	//PrintSignedShortFormated(isqrt_c16(23442));
-//  463 	//PrintString("\n");	
-//  464 	return 0;	
-        LDI     R16, 0
-        LDI     R17, 0
-        RET
+//  480         TIME_FUNC(chg_registers);
+        LDI     R18, LOW((`?<Constant "float_convert_to_float">` + 435))
+        LDI     R19, HIGH((`?<Constant "float_convert_to_float">` + 435))
+        LDI     R16, LOW(chg_registers/2)
+        LDI     R17, (chg_registers/2) >> 8
+        RJMP    print_execute_time
         CFI EndBlock cfiBlock47
-//  465 }
+//  481         
+//  482 	//PrintString(" - sqrt(23442.0)  = ");
+//  483 	//PrintSignedShortFormated(sqrt(23442.0));	
+//  484 	//PrintString("\n - isqrt16(23442) = ");
+//  485 	//PrintSignedShortFormated(isqrt_c16(23442));
+//  486 	//PrintString("\n");	
+//  487 	//return 0;	
+//  488 }
 
         ASEGN ABSOLUTE:DATA:NOROOT,01cH
 __?EECR:
@@ -2615,6 +2648,8 @@ __?EEARH:
         DC8 "print_int16"
 `?<Initializer for <Constant "print_int16_itoa"`:
         DC8 "print_int16_itoa"
+`?<Initializer for <Constant "chg_registers">>`:
+        DC8 "chg_registers"
 
         RSEG INITTAB:CODE:NOROOT(0)
 `?<Segment init: NEAR_I>`:
@@ -2677,15 +2712,15 @@ __?EEARH:
         END
 // 
 //     5 bytes in segment ABSOLUTE
-// 1 946 bytes in segment CODE
+// 1 950 bytes in segment CODE
 //    14 bytes in segment INITTAB
 //   132 bytes in segment NEAR_F
-//   483 bytes in segment NEAR_I
-//   483 bytes in segment NEAR_ID
+//   497 bytes in segment NEAR_I
+//   497 bytes in segment NEAR_ID
 //   200 bytes in segment NEAR_Z
 // 
-// 2 561 bytes of CODE memory (+ 14 bytes shared)
-//   683 bytes of DATA memory (+  5 bytes shared)
+// 2 579 bytes of CODE memory (+ 14 bytes shared)
+//   697 bytes of DATA memory (+  5 bytes shared)
 //
 //Errors: none
-//Warnings: 8
+//Warnings: 44

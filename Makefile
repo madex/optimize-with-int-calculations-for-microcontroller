@@ -23,6 +23,12 @@ OBJDUMP    = avr-objdump
 simul: $(OUT)_sim.elf $(OUT)_sim.lst 
 	simulavr -d $(SIM_DEV) -W $(SIM_WIO),- -f $(OUT)_sim.elf -T exit
 
+simul_iar: iar_sim.elf   
+	simulavr -d $(SIM_DEV) -W $(SIM_WIO),- -f iar_sim.elf
+    
+iar_sim.elf: iar/Debug/Exe/test.hex
+	avr-objcopy -I ihex -O elf32-avr iar\Debug\Exe\test.hex iar_sim.elf
+    
 %_sim.o: %.c
 	$(MCU_CC) $(SIM_FLAGS) -o $@ -c $<
 

@@ -575,7 +575,7 @@
         </option>
         <option>
           <name>AList</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>AListHeader</name>
@@ -663,7 +663,7 @@
         </option>
         <option>
           <name>AsmMultiByteSupport</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>AavrVariantMemory</name>
@@ -1989,6 +1989,9 @@
       <data/>
     </settings>
   </configuration>
+  <file>
+    <name>$PROJ_DIR$\..\registerTest.asm</name>
+  </file>
   <file>
     <name>$PROJ_DIR$\..\test.c</name>
   </file>

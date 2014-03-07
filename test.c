@@ -104,11 +104,11 @@ typedef void (*test_func_t)(void);
 float a = 3454.345334, b = 12232.45345, c = 0.0;
 short d = 23442;
 
-void float_convert_to_float() {
+void float_convert_to_float(void) {
 	c = d;
 }
 
-void float_convert_to_int() {
+void float_convert_to_int(void) {
 	d = (short) c;
 }
 
@@ -136,11 +136,11 @@ void float_div(void) {
 	c = a / b;
 }
 
-void float_sqrt() {
+void float_sqrt(void) {
 	c = sqrt(a);
 }
 
-void float_sin() {
+void float_sin(void) {
 	c = sin(a);	
 }
 
@@ -150,57 +150,57 @@ static inline unsigned short div10(unsigned short in) {
     return (((unsigned long) in * 52429L)) >> 19;
 }
 
-void int16_div10() {
+void int16_div10(void) {
 	i_c = i_a / 10;
 }
 
-void int16_div10_fast() {
+void int16_div10_fast(void) {
 	i_c = div10(i_a);
 }
 
-void int16_div16() {
+void int16_div16(void) {
 	i_c = i_a / 16;
 }
 
-void int16_div() {
+void int16_div(void) {
     i_c = i_a / i_b;
 } 
 
-void int16_mult_const() {
+void int16_mult_const(void) {
     i_c = i_a * 23;
 } 
 
-void int16_mult() {
+void int16_mult(void) {
     i_c = i_a * i_b;
 } 
 
 unsigned long l_a = 23444, l_b = 23, l_c;
 
-void int32_div10() {
+void int32_div10(void) {
 	l_c = l_a / 10;
 }
 
-void int32_div16() {
+void int32_div16(void) {
 	l_c = l_a / 16;
 }
 
-void int32_div() {
+void int32_div(void) {
     l_c = l_a / l_b;
 } 
 
-void int32_mult_const() {
+void int32_mult_const(void) {
     l_c = l_a * 234;
 } 
 
-void int32_mult() {
+void int32_mult(void) {
     l_c = l_a * l_b;
 }
 
-void int32_sqrt() {
+void int32_sqrt(void) {
 	l_c = isqrt_c32(23442342);
 }
 
-void int32_sqrt_asm() {
+void int32_sqrt_asm(void) {
 #ifndef  __IAR_SYSTEMS_ICC__ 
 #ifndef  CODE_VISION    
 	l_c = isqrt32(23442342);
@@ -208,7 +208,7 @@ void int32_sqrt_asm() {
 #endif
 }
 
-void int16_sqrt_asm() {
+void int16_sqrt_asm(void) {
 #ifndef  __IAR_SYSTEMS_ICC__
 #ifndef  CODE_VISION       
 	i_c = isqrt16(23442);
@@ -216,22 +216,22 @@ void int16_sqrt_asm() {
 #endif    
 }
 
-void int16_sqrt() {
+void int16_sqrt(void) {
 	i_c = isqrt_c16(23442);
 }
 
-void int16_sin() {
+void int16_sin(void) {
 	l_c = Sine(0x7FFF/6);
 }
 
 
-void empty_func() {
+void empty_func(void) {
 }
 
 #define MAX_U_STELL 1000L
 int16_t v_soll = 100, v_ist = 80, u_stell;
 
-void int16_pi_regler() {
+void int16_pi_regler(void) {
 	static int32_t u_stell_l = 0;
 	static int16_t reg_abw, reg_abw_old;
         static uint8_t kp = 50, ki = 15;
@@ -251,6 +251,9 @@ void int16_pi_regler() {
 #define special_output_port (*((__io *) SIM_WIO))
 /* This port correponds to the "-R 0x22,-" command line option. */
 #define special_input_port  (*((__io *) SIM_RIO))
+
+__no_init uint8_t WIO @ 0x30;
+
 #else
 /* This port correponds to the "-W 0x20,-" command line option. */
 #define special_output_port (*((volatile char *) SIM_WIO))
@@ -259,13 +262,18 @@ void int16_pi_regler() {
 #endif
 
 static void PrintString(char* str) {
-	const char *c;
 #ifndef  __IAR_SYSTEMS_ICC__
 #ifndef  CODE_VISION
+    const char *c;
 	for(c = str; *c; c++)
 	  special_output_port = *c;
 #endif
+#else
+   const char *c;
+   for(c = str; *c; c++)
+	  WIO = *c; 
 #endif
+  
 }
 
 static void PrintSignedShortFormated(signed short value) {
@@ -295,7 +303,7 @@ static void PrintSignedShortFormated(signed short value) {
     *--sBuf = minus;                  // Minuszeichen vor die höchstwertigste Stelle setzen
     while (sBuf > sBuf0)              // mit Leerzeichen auffüllen (für Formatierung)  
       *--sBuf = ' ';
-    PrintString(sBuf0); // String ausgeben
+    PrintString((char*) sBuf0); // String ausgeben
 }
 
 
@@ -303,8 +311,70 @@ void print_int16(void) {
 	PrintSignedShortFormated(-32421);
 }
 
+static char* myitoa(signed long val) {
+	static char buf[13];
+	char *sBuf = &buf[12];
+	unsigned char sign = val < 0;
+	unsigned long value, valueOld;
+	*sBuf = 0;
+	if (sign)
+		value = (unsigned long) -val;
+	else
+		value = (unsigned long) val;
+	do {
+		valueOld = value;
+		value /= 10;
+		*--sBuf = '0' + valueOld - (value * 10); // schneller als % 10
+	}  while (value);
+	if (sign)
+		*--sBuf = '-';
+	return sBuf;
+}
+
+static char *myitoa2(int32_t zahl) {
+	static uint32_t subtractors[] = {1000000000,100000000,10000000,1000000,
+                                     100000,10000,1000,100,10,1};
+	static char string[12];
+	char *str = string, n;	
+	uint32_t u, *sub = subtractors;  
+    uint8_t i = 10;
+	if (zahl < 0) {                 
+		*str++ = '-';              
+		u = (uint32_t) -zahl;
+	} else
+		u = (uint32_t) zahl;
+	// führende nullen entfernen 			
+	while (i > 1 && u < *sub) {
+		if (u >= *sub)
+			break;
+		i--;
+		sub++;
+	}
+	while (i--) {
+		n = '0';
+		while (u >= *sub) {
+			n++;
+			u -= *sub;
+		} 
+		*str++ = n;
+		sub++;
+	}
+	*str = 0;
+	return string;
+}
+
+void print_myitoa(void) {
+   PrintString(myitoa(-32421)); 
+
+}
+
+void print_myitoa2(void) {
+   PrintString(myitoa2(-32421));
+
+}
+
 void print_int16_itoa(void) {
-	unsigned char sbuf[7];
+	char sbuf[7];
 #ifndef  __IAR_SYSTEMS_ICC__
 #ifndef  CODE_VISION  
 	itoa(-32421, sbuf, 10);
@@ -394,9 +464,9 @@ static void PrintSignedShort(signed short value) {
 */
 
 // typedef void (*test_func_t)(void);
-#define TIME_FUNC(func) print_execute_time(func, (unsigned char*) "" # func) 
+#define TIME_FUNC(func) print_execute_time(func, (char*) "" # func) 
 
-unsigned short print_execute_time(test_func_t function, char name[]) {
+unsigned short print_execute_time(test_func_t function, char* name) {
 	// Timer anhalten und initialisieren
 	TCCR1A = 0;
 	TCCR1B = 0;
@@ -421,6 +491,8 @@ static void assert_(uint8_t compareTrue, uint16_t line) {
       PrintString("\n");
     }
 }
+
+extern void chg_registers();
 
 void main() {
 	PrintString("\nZeitmessung Rechenoperationen\n");
@@ -475,6 +547,10 @@ void main() {
 	TIME_FUNC(empty_func);  
 	TIME_FUNC(print_int16);
 	TIME_FUNC(print_int16_itoa);
+    TIME_FUNC(print_myitoa);  
+    TIME_FUNC(print_myitoa2);
+   // TIME_FUNC(chg_registers);
+        
 	//PrintString(" - sqrt(23442.0)  = ");
 	//PrintSignedShortFormated(sqrt(23442.0));	
 	//PrintString("\n - isqrt16(23442) = ");
