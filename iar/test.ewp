@@ -708,7 +708,7 @@
       <name>XLINK</name>
       <archiveVersion>2</archiveVersion>
       <data>
-        <version>13</version>
+        <version>14</version>
         <wantNonLocal>1</wantNonLocal>
         <debug>1</debug>
         <option>
@@ -966,6 +966,11 @@
         <option>
           <name>CrcInitialValue</name>
           <state>0x00</state>
+        </option>
+        <option>
+          <name>CrcUnitSize</name>
+          <version>0</version>
+          <state>0</state>
         </option>
       </data>
     </settings>
@@ -1701,7 +1706,7 @@
       <name>XLINK</name>
       <archiveVersion>2</archiveVersion>
       <data>
-        <version>13</version>
+        <version>14</version>
         <wantNonLocal>1</wantNonLocal>
         <debug>0</debug>
         <option>
@@ -1960,6 +1965,11 @@
           <name>CrcInitialValue</name>
           <state>0x00</state>
         </option>
+        <option>
+          <name>CrcUnitSize</name>
+          <version>0</version>
+          <state>0</state>
+        </option>
       </data>
     </settings>
     <settings>
@@ -1989,9 +1999,6 @@
       <data/>
     </settings>
   </configuration>
-  <file>
-    <name>$PROJ_DIR$\..\registerTest.asm</name>
-  </file>
   <file>
     <name>$PROJ_DIR$\..\test.c</name>
   </file>

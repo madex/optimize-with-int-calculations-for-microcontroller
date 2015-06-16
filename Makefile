@@ -1,7 +1,7 @@
 OUT      ?= test
 OBJ       = $(OUT).o asmlib.o
 
-OPTIMIZE  = -Os
+OPTIMIZE  = -O1
 WARNINGS  =
 LIBS      = 
 SIM_OBJ   = $(patsubst %.o,%_sim.o,$(OBJ))
